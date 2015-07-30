@@ -34,11 +34,17 @@ public class Principal{
 		JMenu ayuda = new JMenu("Ayuda");
 		menuPrin.add(opciones);
 		menuPrin.add(ayuda);
-		JMenuItem crearCuenta = new JMenuItem("Crear Cuenta...");
-		JMenuItem preferencias = new JMenuItem("Preferencias");
+		
+		//Item Crear Cuenta
+		JMenuItem crearCuenta = new JMenuItem("Crear Cuenta..."); 
 		opciones.add(crearCuenta);
+		
+		//Item Preferencias
+		JMenuItem preferencias = new JMenuItem("Preferencias"); 
 		opciones.add(preferencias);
-		JMenuItem acercaDe = new JMenuItem("Acerca De");
+		
+		//Item Acerca De con Listener para mostrar la ventana AcercaDe
+		JMenuItem acercaDe = new JMenuItem("Acerca De"); 
 		ayuda.add(acercaDe);
 		ActionListener acercaDeListener = new ActionListener() {
 			@Override
@@ -49,14 +55,25 @@ public class Principal{
 			}
 		};
 		acercaDe.addActionListener(acercaDeListener);
+		
+		//Item Salir con Listener para salir de la aplicacion
+		JMenuItem salir = new JMenuItem("Salir"); 
+		ayuda.add(salir);
+		ActionListener salirListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		};
+		salir.addActionListener(salirListener);
 	}
 	
 	public void crearZonaLlamar() {
-		zonaLlamar = new JPanel();
+		zonaLlamar = new JPanel(); 
 		llamarField = new JTextField();
 		llamarBut = new JButton();
 		llamarBut.setText("Llamar");
-		zonaLlamar.setLayout(new BoxLayout(zonaLlamar,BoxLayout.X_AXIS));
+		zonaLlamar.setLayout(new BoxLayout(zonaLlamar,BoxLayout.X_AXIS)); // Colocar elementos entorno al eje de las X
 		zonaLlamar.add(Box.createRigidArea(new Dimension (5,0)));
 		zonaLlamar.add(llamarField);
 		zonaLlamar.add(Box.createRigidArea(new Dimension (10,0)));
@@ -79,12 +96,12 @@ public class Principal{
 		ventana.setTitle("Softphone");
 		ventana.setSize(270,400);
 		ventana.setJMenuBar(menuPrin);
-		ventana.add(zonaLlamar, BorderLayout.NORTH);
-		ventana.add(pestanas, BorderLayout.CENTER);
-		ventana.setLocationRelativeTo(null);
-		ventana.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		ventana.setResizable(false);
-		ventana.setVisible(true);
+		ventana.add(zonaLlamar, BorderLayout.NORTH); // Colocar la zona de llamar en la zona de arriba de la ventana
+		ventana.add(pestanas, BorderLayout.CENTER); // Colocar las pestañas en centro de la ventana
+		ventana.setLocationRelativeTo(null); // Poner pantalla en el centro de la pantalla
+		ventana.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); // Funcion para terminar la aplicacion al cerrar la ventana principal
+		ventana.setResizable(false); // Evitar aumentar el tamaño de la ventana
+		ventana.setVisible(true); 
 	}
 
 }
