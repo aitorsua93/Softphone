@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -18,6 +17,12 @@ public class AcercaDe extends JDialog {
 	JPanel panelText, panelBut;
 	JLabel titulo, descr, copy;
 	JButton okBut;
+	
+	public static void main (String[] args) {
+		AcercaDe acercade = new AcercaDe();
+		acercade.setLocationRelativeTo(null);
+		acercade.setVisible(true);
+	}
 	
 	public AcercaDe() {
 		crearPanelTexto();

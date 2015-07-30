@@ -85,7 +85,7 @@ public class Principal{
 		pestanas = new JTabbedPane();
 		JPanel agenda = new JPanel();
 		JPanel historico = new JPanel();
-		JPanel dialpad = new JPanel();
+		JPanel dialpad = new Dialpad(llamarField);
 		pestanas.addTab("Agenda", agenda);
 		pestanas.addTab("Historico", historico);
 		pestanas.addTab("Dialpad", dialpad);
@@ -94,13 +94,13 @@ public class Principal{
 	public void crearVentana() {
 		ventana = new JFrame();
 		ventana.setTitle("Softphone");
-		ventana.setSize(270,400);
+		ventana.setSize(230,350);
 		ventana.setJMenuBar(menuPrin);
 		ventana.add(zonaLlamar, BorderLayout.NORTH); // Colocar la zona de llamar en la zona de arriba de la ventana
 		ventana.add(pestanas, BorderLayout.CENTER); // Colocar las pestañas en centro de la ventana
 		ventana.setLocationRelativeTo(null); // Poner pantalla en el centro de la pantalla
 		ventana.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); // Funcion para terminar la aplicacion al cerrar la ventana principal
-		ventana.setResizable(false); // Evitar aumentar el tamaño de la ventana
+		ventana.setResizable(true); // Evitar aumentar el tamaño de la ventana
 		ventana.setVisible(true); 
 	}
 
