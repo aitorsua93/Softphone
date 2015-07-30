@@ -2,10 +2,12 @@ package app.softphone.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-public class Principal {
+public class Principal{
 	JFrame ventana;
 	JMenuBar menuPrin;
 	JTabbedPane pestanas;
@@ -38,10 +40,19 @@ public class Principal {
 		opciones.add(preferencias);
 		JMenuItem acercaDe = new JMenuItem("Acerca De");
 		ayuda.add(acercaDe);
+		ActionListener acercaDeListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AcercaDe acercaDe = new AcercaDe();
+				acercaDe.setLocationRelativeTo(ventana);
+				acercaDe.setVisible(true);
+			}
+		};
+		acercaDe.addActionListener(acercaDeListener);
 	}
 	
 	public void crearZonaLlamar() {
-		zonaLlamar = new JPanel(/*new BorderLayout()*/);
+		zonaLlamar = new JPanel();
 		llamarField = new JTextField();
 		llamarBut = new JButton();
 		llamarBut.setText("Llamar");
@@ -71,7 +82,7 @@ public class Principal {
 		ventana.add(zonaLlamar, BorderLayout.NORTH);
 		ventana.add(pestanas, BorderLayout.CENTER);
 		ventana.setLocationRelativeTo(null);
-		ventana.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		ventana.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		ventana.setResizable(false);
 		ventana.setVisible(true);
 	}
