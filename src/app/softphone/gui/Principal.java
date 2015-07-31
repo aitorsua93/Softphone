@@ -35,9 +35,18 @@ public class Principal{
 		menuPrin.add(opciones);
 		menuPrin.add(ayuda);
 		
-		//Item Crear Cuenta
+		//Item Crear Cuenta con Listener para mostrar la ventana CrearCuenta
 		JMenuItem crearCuenta = new JMenuItem("Crear Cuenta..."); 
 		opciones.add(crearCuenta);
+		ActionListener crearCuentaListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CrearCuenta crearCuenta = new CrearCuenta();
+				crearCuenta.setLocationRelativeTo(ventana);
+				crearCuenta.setVisible(true);
+			}
+		};
+		crearCuenta.addActionListener(crearCuentaListener);
 		
 		//Item Preferencias
 		JMenuItem preferencias = new JMenuItem("Preferencias"); 
@@ -94,7 +103,7 @@ public class Principal{
 	public void crearVentana() {
 		ventana = new JFrame();
 		ventana.setTitle("Softphone");
-		ventana.setSize(230,350);
+		ventana.setSize(260,380);
 		ventana.setJMenuBar(menuPrin);
 		ventana.add(zonaLlamar, BorderLayout.NORTH); // Colocar la zona de llamar en la zona de arriba de la ventana
 		ventana.add(pestanas, BorderLayout.CENTER); // Colocar las pestañas en centro de la ventana

@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+
 @SuppressWarnings("serial")
 public class Dialpad extends JPanel implements ActionListener {
 	
@@ -18,7 +19,7 @@ public class Dialpad extends JPanel implements ActionListener {
 	
 	public Dialpad(JTextField llamarText) {
 		llamarField = llamarText;
-		setLayout(new GridLayout(4,3,5,5));
+		setLayout(new GridLayout(4,3,20,20));
 		crearBotones();
 	}
 	

@@ -35,7 +35,7 @@ public class AcercaDe extends JDialog {
 		panelText = new JPanel();
 		titulo = new JLabel("Softphone", JLabel.CENTER);
 		titulo.setFont(new Font("Calibri",1,30));
-		descr = new JLabel("Teléfono a través de de la red  que usa el protocolo estándar SIP (rfc 3261)", JLabel.CENTER);
+		descr = new JLabel("Teléfono a través de la red que usa el protocolo estándar SIP (rfc 3261)", JLabel.CENTER);
 		descr.setFont(new Font("Calibri",1,11));
 		copy = new JLabel("(C) Aitor Communications, 2015", JLabel.CENTER);
 		copy.setFont(new Font("Calibri",1,9));
@@ -68,6 +68,7 @@ public class AcercaDe extends JDialog {
 		add(panelText,BorderLayout.CENTER);
 		add(panelBut, BorderLayout.SOUTH);
 		setModal(true);
+		setResizable(false);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 }
