@@ -7,23 +7,14 @@ public class Cuentas extends JPanel {
 
 	JPanel panelSelec;
 	
-	public static void main(String[] args) {
-		Cuentas preferencias = new Cuentas();
-		preferencias.setVisible(true);
+	public Cuentas() {
 		
 	}
 	
-	public Cuentas() {
-		crearVentana();
-	}
-	
-	public void crearPanelSelec() {
+	public void crearPanel() {
 		panelSelec = new JPanel();
 		
 	}
-	
-	public void crearVentana() {
-		setSize(500,500);
-	}
+
 	
 }

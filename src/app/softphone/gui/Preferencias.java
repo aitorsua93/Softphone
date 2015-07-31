@@ -32,8 +32,8 @@ public class Preferencias extends JDialog {
 
 	public void crearPestanas() {
 		pestanas = new JTabbedPane();
-		cuenta = new JPanel();
-		desvio = new JPanel();
+		cuenta = new Cuentas();
+		desvio = new Desvio();
 		captura = new JPanel();
 		pestanas.addTab("Cuentas", cuenta);
 		pestanas.addTab("Desvio de Llamada", desvio);
@@ -61,6 +61,7 @@ public class Preferencias extends JDialog {
 	}
 	
 	public void crearVentana() {
+		setTitle("Preferencias");
 		setSize(500,500);
 		setModal(true);
 		add(pestanas, BorderLayout.CENTER);
