@@ -23,7 +23,7 @@ public class CrearCuenta extends JDialog {
 	JTextField usuarioText, servidorText, nombreText;
 	JPasswordField passwordText;
 	JPanel panelDatos, panelBotones;
-	JButton aceptar, cancelar;
+	JButton aceptarCue, cancelarCue;
 	
 	public static void main (String[] args) {
 		CrearCuenta crearCuenta = new CrearCuenta();
@@ -69,20 +69,20 @@ public class CrearCuenta extends JDialog {
 	public void crearPanelBotones() {
 		panelBotones = new JPanel(new FlowLayout());
 		
-		aceptar = new JButton();
-		aceptar.setText("Aceptar");
-		panelBotones.add(aceptar);
+		aceptarCue = new JButton();
+		aceptarCue.setText("Aceptar");
+		panelBotones.add(aceptarCue);
 		
-		cancelar = new JButton();
-		cancelar.setText("Cancelar");
-		panelBotones.add(cancelar);
-		ActionListener cancelarListener = new ActionListener() {
+		cancelarCue = new JButton();
+		cancelarCue.setText("Cancelar");
+		panelBotones.add(cancelarCue);
+		ActionListener cancelarCueListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		};
-		cancelar.addActionListener(cancelarListener);
+		cancelarCue.addActionListener(cancelarCueListener);
 	}
 	
 	public void crearVentana() {

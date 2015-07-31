@@ -51,6 +51,15 @@ public class Principal{
 		//Item Preferencias
 		JMenuItem preferencias = new JMenuItem("Preferencias"); 
 		opciones.add(preferencias);
+		ActionListener preferenciasListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Preferencias preferencias = new Preferencias();
+				preferencias.setLocationRelativeTo(ventana);
+				preferencias.setVisible(true);
+			}
+		};
+		preferencias.addActionListener(preferenciasListener);
 		
 		//Item Acerca De con Listener para mostrar la ventana AcercaDe
 		JMenuItem acercaDe = new JMenuItem("Acerca De"); 
