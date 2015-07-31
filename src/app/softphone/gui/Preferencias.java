@@ -34,7 +34,7 @@ public class Preferencias extends JDialog {
 		pestanas = new JTabbedPane();
 		cuenta = new Cuentas();
 		desvio = new Desvio();
-		captura = new JPanel();
+		captura = new Captura();
 		pestanas.addTab("Cuentas", cuenta);
 		pestanas.addTab("Desvio de Llamada", desvio);
 		pestanas.addTab("Captura de Llamada", captura);
