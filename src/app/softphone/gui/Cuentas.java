@@ -2,6 +2,8 @@ package app.softphone.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class Cuentas extends JPanel {
 	
 	public Cuentas() {
 		crearPanelLista();
-		crearPanelBotones();
+		//crearPanelBotones();
 		add(panelLista, BorderLayout.WEST);
 		add(panelBotones, BorderLayout.CENTER);
 	}
@@ -49,9 +51,10 @@ public class Cuentas extends JPanel {
 		JScrollPane listScroller = new JScrollPane(lista);
 		listScroller.setPreferredSize(new Dimension(250, 320));
 		panelLista.add(listScroller, BorderLayout.CENTER);
+		crearPanelBotones(lista);
 	}
 
-	public void crearPanelBotones() {
+	public void crearPanelBotones(JList<String> list) {
 		panelBotones = new JPanel();
 		panelBotones.setLayout(new BoxLayout(panelBotones,BoxLayout.Y_AXIS));
 		crCuenta = new JButton();
@@ -65,5 +68,16 @@ public class Cuentas extends JPanel {
 		elCuenta = new JButton();
 		elCuenta.setText("Eliminar");
 		panelBotones.add(elCuenta);
+		ActionListener elCuentaListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String c = list.getSelectedValue();
+				int index = list.getSelectedIndex();
+				String[] nombre = c.split("\\s+");
+				ln.remove(index);
+				op.borrar(nombre[0]);
+			}
+		};
+		elCuenta.addActionListener(elCuentaListener);
 	}
 }
