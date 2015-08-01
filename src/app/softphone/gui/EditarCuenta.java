@@ -12,6 +12,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -19,9 +20,8 @@ import javax.swing.JTextField;
 import app.softphone.core.cuentas.Cuenta;
 import app.softphone.core.cuentas.OperacionesCuenta;
 
-
 @SuppressWarnings("serial")
-public class CrearCuenta extends JDialog {
+public class EditarCuenta extends JDialog{
 	
 	JLabel usuarioLabel, servidorLabel, passwordLabel, nombreLabel;
 	JTextField usuarioText, servidorText, nombreText;
@@ -29,28 +29,15 @@ public class CrearCuenta extends JDialog {
 	JPanel panelDatos, panelBotones;
 	JButton aceptarCue, cancelarCue;
 	Cuenta nuevaCuenta;
-	DefaultListModel<String> ln = new DefaultListModel<String>();;
 	OperacionesCuenta op = new OperacionesCuenta();
-	
-	public static void main (String[] args) {
-		CrearCuenta crearCuenta = new CrearCuenta();
-		crearCuenta.setLocationRelativeTo(null);
-		crearCuenta.setVisible(true);
-	}
-	
-	public CrearCuenta(DefaultListModel<String> ln) {
-		crearPanelDatos();
-		crearPanelBotones(ln);
-		crearVentana();
-	}
 
-	public CrearCuenta() {
-		crearPanelDatos();
-		crearPanelBotones(ln);
+	public EditarCuenta(Cuenta edCuenta,DefaultListModel<String> ln, int index) {
+		crearPanelDatos(edCuenta);
+		crearPanelBotones(edCuenta,ln,index);
 		crearVentana();
 	}
 	
-	public void crearPanelDatos() {
+	public void crearPanelDatos(Cuenta edCuenta) {
 		panelDatos = new JPanel();
 
 		panelDatos.setLayout(new GridLayout(5,5,10,10));
@@ -59,27 +46,33 @@ public class CrearCuenta extends JDialog {
 		panelDatos.add(usuarioLabel);
 		
 		usuarioText = new JTextField();
+		usuarioText.setText(edCuenta.getUsuario());
 		panelDatos.add(usuarioText);
 		
 		servidorLabel = new JLabel("Servidor de registro:");
 		panelDatos.add(servidorLabel);
 		
 		servidorText = new JTextField();
+		servidorText.setText(edCuenta.getServidor());
 		panelDatos.add(servidorText);
 	
 		passwordLabel = new JLabel("Contraseña:");
 		panelDatos.add(passwordLabel);
+		
 		passwordText = new JPasswordField();
+		passwordText.setText(edCuenta.getPassword());
 		panelDatos.add(passwordText);
 		
 		nombreLabel = new JLabel("Nombre:");
 		panelDatos.add(nombreLabel);
+		
 		nombreText = new JTextField();
+		nombreText.setText(edCuenta.getNombre());
 		panelDatos.add(nombreText);
 	}
 	
 
-	public void crearPanelBotones(DefaultListModel<String> ln) {
+	public void crearPanelBotones(Cuenta edCuenta,DefaultListModel<String> ln, int index) {
 		panelBotones = new JPanel(new FlowLayout());
 		
 		aceptarCue = new JButton();
@@ -93,8 +86,9 @@ public class CrearCuenta extends JDialog {
 				String password = passwordText.getText();//Temporal hasta encontrar solucion
 				String nombre = nombreText.getText();
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre);
-				op.crear(nuevaCuenta);
-				ln.addElement(nombre + " <" + usuario + "@" + servidor + ">");
+				op.actualizar(nuevaCuenta, edCuenta.getNombre());
+				ln.remove(index);
+				ln.add(index, nombre + " <" + usuario + "@" + servidor + ">");
 				dispose();
 			}
 		};
@@ -113,7 +107,7 @@ public class CrearCuenta extends JDialog {
 	}
 	
 	public void crearVentana() {
-		setTitle("Crear Cuenta");
+		setTitle("Editar Cuenta");
 		setModal(true);
 		setSize(400,250);
 		add(panelDatos, BorderLayout.CENTER);
@@ -123,4 +117,5 @@ public class CrearCuenta extends JDialog {
 		add(Box.createRigidArea(new Dimension (30,20)), BorderLayout.EAST);
 		setResizable(false);
 	}
+
 }

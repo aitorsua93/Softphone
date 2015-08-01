@@ -117,7 +117,7 @@ public class Principal{
 		ventana.add(zonaLlamar, BorderLayout.NORTH); // Colocar la zona de llamar en la zona de arriba de la ventana
 		ventana.add(pestanas, BorderLayout.CENTER); // Colocar las pestañas en centro de la ventana
 		ventana.setLocationRelativeTo(null); // Poner pantalla en el centro de la pantalla
-		ventana.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); // Funcion para terminar la aplicacion al cerrar la ventana principal
+		ventana.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // Funcion para terminar la aplicacion al cerrar la ventana principal
 		ventana.setResizable(true); // Evitar aumentar el tamaño de la ventana
 		ventana.setVisible(true); 
 	}

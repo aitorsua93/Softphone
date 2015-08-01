@@ -25,16 +25,17 @@ public class OperacionesCuenta {
 
 	
 	public static void main(String[] args) {
-		//Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion");
+		Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion");
 		//Cuenta cuenta2 = new Cuenta("2222","192.168.1.100","456","Secretaria");
 		OperacionesCuenta op = new OperacionesCuenta();
 		//op.crear(cuenta1);
 		//op.crear(cuenta2);
 		List<Cuenta> c = new ArrayList<Cuenta>();
-		op.borrar("Santi");
+		//op.borrar("Santi");
+		op.actualizar(cuenta1, "Aitor");
 		c = op.buscarCuentas();
 		System.out.println(c.get(0).getNombre());
-		System.out.println(c.get(1).getNombre());
+		//System.out.println(c.get(1).getNombre());
 	}
 	
 	
@@ -181,7 +182,66 @@ public class OperacionesCuenta {
 		return objCuenta;
 	}
 	
-	public void actualizar(Cuenta cuenta) {
+	public void actualizar(Cuenta cuentaAct, String nombreAnt) {
+		try {
+			//clases necesarias para leer XML
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(new File("xmlsrc/cuentas.xml"));
+			
+			//preparamos el archivo XML para leer los datos
+			doc.getDocumentElement().normalize();
+			//obtenemos todos los nodos de la etiqueta "cuentas"
+			NodeList nodosCuentas = doc.getElementsByTagName("cuenta");
+			//por cada nodo se obtienen los datosy se guardan en un objeto
+			for (int i=0;i<nodosCuentas.getLength();i++) {
+				Node cuenta = nodosCuentas.item(i);
+				if (cuenta.getNodeType() == Node.ELEMENT_NODE) {
+					Element unElemento = (Element) cuenta;
+					String n = obtenerNodoValor("nombre",unElemento);
+					if (n.equals(nombreAnt)) {
+						//agregamos una nueva etiqueta al documento
+						Element nuevaCuenta = doc.createElement("cuenta");
+						//agregamos etiquetas hijas
+						Element nuevoUsuario = doc.createElement("usuario");
+						nuevoUsuario.setTextContent(cuentaAct.getUsuario());
+						
+						Element nuevoServidor = doc.createElement("servidor");
+						nuevoServidor.setTextContent(cuentaAct.getServidor());
+						
+						Element nuevoPassword = doc.createElement("password");
+						nuevoPassword.setTextContent(cuentaAct.getPassword());
+						
+						Element nuevoNombre = doc.createElement("nombre");
+						nuevoNombre.setTextContent(cuentaAct.getNombre());
+						
+						//agregar etiquetas a la nueva cuenta
+						nuevaCuenta.appendChild(nuevoUsuario);
+						nuevaCuenta.appendChild(nuevoServidor);
+						nuevaCuenta.appendChild(nuevoPassword);
+						nuevaCuenta.appendChild(nuevoNombre);
+						
+						unElemento.getParentNode().replaceChild(nuevaCuenta, unElemento);
+					};
+				}
+			}
+			TransformerFactory transFactory = TransformerFactory.newInstance();
+			Transformer transformer = transFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File("xmlsrc/cuentas.xml"));
+			transformer.transform(source, result);
+			
+		} catch(ParserConfigurationException parseE) {
+			System.out.println(parseE.getMessage());
+		} catch(SAXException saxE) {
+			System.out.println(saxE.getMessage());
+		} catch(IOException ioE) {
+			System.out.println(ioE.getMessage());
+		} catch(TransformerConfigurationException transE) {
+			System.out.println(transE.getMessage());
+		} catch(TransformerException transformE) {
+			System.out.println(transformE.getMessage());
+		}
 	}
 
 	public void borrar(String nombre) {

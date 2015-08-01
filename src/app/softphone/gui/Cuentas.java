@@ -15,6 +15,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import app.softphone.core.cuentas.Cuenta;
 import app.softphone.core.cuentas.OperacionesCuenta;
@@ -51,10 +53,11 @@ public class Cuentas extends JPanel {
 		JScrollPane listScroller = new JScrollPane(lista);
 		listScroller.setPreferredSize(new Dimension(250, 320));
 		panelLista.add(listScroller, BorderLayout.CENTER);
-		crearPanelBotones(lista);
+		crearPanelBotones(lista,ln);
 	}
 
-	public void crearPanelBotones(JList<String> list) {
+	
+	public void crearPanelBotones(JList<String> list, DefaultListModel<String> ln) {
 		panelBotones = new JPanel();
 		panelBotones.setLayout(new BoxLayout(panelBotones,BoxLayout.Y_AXIS));
 		crCuenta = new JButton();
@@ -68,6 +71,36 @@ public class Cuentas extends JPanel {
 		elCuenta = new JButton();
 		elCuenta.setText("Eliminar");
 		panelBotones.add(elCuenta);
+		elCuenta.setEnabled(false);
+		if (list.getSelectedIndex() == -1) {
+			edCuenta.setEnabled(false);
+			elCuenta.setEnabled(false);
+	    }
+		
+		ActionListener crCuentaListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CrearCuenta editar = new CrearCuenta(ln);
+				editar.setLocationRelativeTo(panelLista);
+				editar.setVisible(true);
+			}
+		};
+		crCuenta.addActionListener(crCuentaListener);
+		
+		ActionListener edCuentaListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String c = list.getSelectedValue();
+				int index = list.getSelectedIndex();
+				String[] nombre = c.split("\\s+");
+				Cuenta cuentaEd = op.buscarCuenta(nombre[0]);
+				EditarCuenta editar = new EditarCuenta(cuentaEd,ln,index);
+				editar.setLocationRelativeTo(panelLista);
+				editar.setVisible(true);
+			}
+		};
+		edCuenta.addActionListener(edCuentaListener);
+		
 		ActionListener elCuentaListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -79,5 +112,19 @@ public class Cuentas extends JPanel {
 			}
 		};
 		elCuenta.addActionListener(elCuentaListener);
+		
+		ListSelectionListener listaListener = new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (list.getSelectedIndex() == -1) {
+					edCuenta.setEnabled(false);
+					elCuenta.setEnabled(false);
+			    } else {
+			    	edCuenta.setEnabled(true);
+			    	elCuenta.setEnabled(true);
+			    }
+			}
+		};
+		list.addListSelectionListener(listaListener);
 	}
 }
