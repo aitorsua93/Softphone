@@ -15,6 +15,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import app.softphone.core.cuentas.Cuenta;
+import app.softphone.core.cuentas.OperacionesCuenta;
+
 
 @SuppressWarnings("serial")
 public class CrearCuenta extends JDialog {
@@ -24,6 +27,8 @@ public class CrearCuenta extends JDialog {
 	JPasswordField passwordText;
 	JPanel panelDatos, panelBotones;
 	JButton aceptarCue, cancelarCue;
+	Cuenta nuevaCuenta;
+	OperacionesCuenta op = new OperacionesCuenta();
 	
 	public static void main (String[] args) {
 		CrearCuenta crearCuenta = new CrearCuenta();
@@ -72,6 +77,19 @@ public class CrearCuenta extends JDialog {
 		aceptarCue = new JButton();
 		aceptarCue.setText("Aceptar");
 		panelBotones.add(aceptarCue);
+		ActionListener aceptarCueListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String usuario = usuarioText.getText();
+				String servidor = servidorText.getText();
+				String password = passwordText.getText();//Temporal hasta encontrar solucion
+				String nombre = nombreText.getText();
+				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre);
+				op.crear(nuevaCuenta);
+				dispose();
+			}
+		};
+		aceptarCue.addActionListener(aceptarCueListener);
 		
 		cancelarCue = new JButton();
 		cancelarCue.setText("Cancelar");
