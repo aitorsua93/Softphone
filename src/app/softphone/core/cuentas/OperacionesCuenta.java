@@ -2,6 +2,7 @@ package app.softphone.core.cuentas;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,17 +18,21 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class OperacionesCuenta {
 
 	
 	public static void main(String[] args) {
-		Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion");
+		//Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion");
 		//Cuenta cuenta2 = new Cuenta("2222","192.168.1.100","456","Secretaria");
 		OperacionesCuenta op = new OperacionesCuenta();
-		op.crear(cuenta1);
+		//op.crear(cuenta1);
 		//op.crear(cuenta2);
+		List<Cuenta> c = new ArrayList<Cuenta>();
+		c = op.buscarCuentas();
+		System.out.println(c.get(0).getNombre());
 	}
 	
 	
@@ -91,19 +96,59 @@ public class OperacionesCuenta {
 	}
 
 
+	public static String obtenerNodoValor(String strTag, Element eCuenta) {
+		Node nValor = (Node)eCuenta.getElementsByTagName(strTag).item(0).getFirstChild();
+		return nValor.getNodeValue();
+	}
+	
+	public List<Cuenta> buscarCuentas() {
+		List<Cuenta> listaCuentas = new ArrayList<Cuenta>();
+		
+		try {
+			//clases necesarias para leer XML
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(new File("xmlsrc/cuentas.xml"));
+			
+			//preparamos el archivo XML para leer los datos
+			doc.getDocumentElement().normalize();
+			//obtenemos todos los nodos de la etiqueta "cuentas"
+			NodeList nodosCuentas = doc.getElementsByTagName("cuentas");
+			//por cada nodo se obtienen los datosy se guardan en un objeto
+			for (int i=0;i<nodosCuentas.getLength();i++) {
+				Node cuenta = nodosCuentas.item(i);
+				if (cuenta.getNodeType() == Node.ELEMENT_NODE) {
+					Element unElemento = (Element) cuenta;
+					
+					Cuenta objCuenta = new Cuenta();
+					objCuenta.setUsuario(obtenerNodoValor("usuario",unElemento));
+					objCuenta.setServidor(obtenerNodoValor("servidor",unElemento));
+					objCuenta.setPassword(obtenerNodoValor("password",unElemento));
+					objCuenta.setNombre(obtenerNodoValor("nombre",unElemento));
+				
+					listaCuentas.add(objCuenta);
+				}
+			}
+			
+		} catch(ParserConfigurationException parseE) {
+			System.out.println(parseE.getMessage());
+		} catch(SAXException saxE) {
+			System.out.println(saxE.getMessage());
+		} catch(IOException ioE) {
+			System.out.println(ioE.getMessage());
+		}
+		
+		return listaCuentas;
+	}
+	
+	public Cuenta buscarCuenta(String nombre) {
+		return null;
+	}
+	
 	public void actualizar(Cuenta cuenta) {
 	}
 
-	public List<Cuenta> BuscarCuentas() {
-		return null;
-	}
-
-
-	public Cuenta BuscarCuenta(String nombre) {
-		return null;
-	}
-
-	public void Borrar(String nombre) {
+	public void borrar(String nombre) {
 		
 	}
 	

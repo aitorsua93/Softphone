@@ -5,6 +5,11 @@ public class Cuenta {
 	String usuario, servidor, nombre;
 	String password;
 	
+	
+	public Cuenta() {
+		
+	}
+	
 	public Cuenta(String usuario, String servidor, String password, String nombre) {
 		this.usuario = usuario;
 		this.servidor = servidor;
