@@ -33,6 +33,7 @@ public class OperacionesCuenta {
 		List<Cuenta> c = new ArrayList<Cuenta>();
 		c = op.buscarCuentas();
 		System.out.println(c.get(0).getNombre());
+		System.out.println(c.get(1).getNombre());
 	}
 	
 	
@@ -113,7 +114,7 @@ public class OperacionesCuenta {
 			//preparamos el archivo XML para leer los datos
 			doc.getDocumentElement().normalize();
 			//obtenemos todos los nodos de la etiqueta "cuentas"
-			NodeList nodosCuentas = doc.getElementsByTagName("cuentas");
+			NodeList nodosCuentas = doc.getElementsByTagName("cuenta");
 			//por cada nodo se obtienen los datosy se guardan en un objeto
 			for (int i=0;i<nodosCuentas.getLength();i++) {
 				Node cuenta = nodosCuentas.item(i);
