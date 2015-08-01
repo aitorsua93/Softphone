@@ -18,6 +18,8 @@ import javax.swing.JTextField;
 
 import app.softphone.core.cuentas.Cuenta;
 import app.softphone.core.cuentas.OperacionesCuenta;
+import app.softphone.core.sip.Inicializar;
+import app.softphone.core.sip.Register;
 
 
 @SuppressWarnings("serial")
@@ -31,22 +33,17 @@ public class CrearCuenta extends JDialog {
 	Cuenta nuevaCuenta;
 	DefaultListModel<String> ln = new DefaultListModel<String>();;
 	OperacionesCuenta op = new OperacionesCuenta();
-	
-	public static void main (String[] args) {
-		CrearCuenta crearCuenta = new CrearCuenta();
-		crearCuenta.setLocationRelativeTo(null);
-		crearCuenta.setVisible(true);
-	}
-	
+	Inicializar ini = null;
+
 	public CrearCuenta(DefaultListModel<String> ln) {
 		crearPanelDatos();
-		crearPanelBotones(ln);
+		crearPanelBotones(ln,ini);
 		crearVentana();
 	}
 
-	public CrearCuenta() {
+	public CrearCuenta(Inicializar ini) {
 		crearPanelDatos();
-		crearPanelBotones(ln);
+		crearPanelBotones(ln,ini);
 		crearVentana();
 	}
 	
@@ -79,7 +76,7 @@ public class CrearCuenta extends JDialog {
 	}
 	
 
-	public void crearPanelBotones(DefaultListModel<String> ln) {
+	public void crearPanelBotones(DefaultListModel<String> ln, Inicializar ini) {
 		panelBotones = new JPanel(new FlowLayout());
 		
 		aceptarCue = new JButton();
@@ -95,6 +92,7 @@ public class CrearCuenta extends JDialog {
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre);
 				op.crear(nuevaCuenta);
 				ln.addElement(nombre + " <" + usuario + "@" + servidor + ">");
+				new Register(nuevaCuenta,ini);
 				dispose();
 			}
 		};
