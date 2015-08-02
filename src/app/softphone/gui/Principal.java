@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-import app.softphone.core.sip.Inicializar;
 
 public class Principal{
 	JFrame ventana;
@@ -16,7 +15,6 @@ public class Principal{
 	JPanel zonaLlamar;
 	JTextField llamarField;
 	JButton llamarBut;
-	Inicializar ini ;
 	
 	public static void main (String[] args) {
 		new Principal();
@@ -24,15 +22,14 @@ public class Principal{
 
 	
 	public Principal () {
-		ini = new Inicializar();
-		crearMenu(ini);
+		crearMenu();
 		crearZonaLlamar();
 		crearPestanas();
 		crearVentana();
 	}
 	
 	
-	public void crearMenu(Inicializar ini) {
+	public void crearMenu() {
 		menuPrin = new JMenuBar();
 		JMenu opciones = new JMenu("Opciones");
 		JMenu ayuda = new JMenu("Ayuda");
@@ -45,7 +42,7 @@ public class Principal{
 		ActionListener crearCuentaListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CrearCuenta crearCuenta = new CrearCuenta(ini);
+				CrearCuenta crearCuenta = new CrearCuenta();
 				crearCuenta.setLocationRelativeTo(ventana);
 				crearCuenta.setVisible(true);
 			}
