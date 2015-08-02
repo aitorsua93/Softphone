@@ -1,5 +1,6 @@
 package app.softphone.core.sip;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class Register {
 	private final String tag = "nkslhjfr89ew5yfoqiwehr938dewq-fdwfef23u";
 	private final String myIP = "192.168.1.101";
 	
+	
 	public Register(Cuenta cuenta, Inicializar ini) {
 		crearListenPoint(ini);
 		enviarRegister(cuenta,ini);
@@ -33,7 +35,7 @@ public class Register {
 		 udp = ini.sipStack.createSipProvider(udpPoint);
 		 udp.addSipListener(listener);
 		} catch(Exception e){
-			System.out.println("ERROR CREAR LISTENING POINT CON SIPLISTENER");
+			System.out.println(e.getMessage());
 		}
 	}
 	
@@ -47,7 +49,7 @@ public class Register {
 		    SipURI myURI = ini.address.createSipURI(cuenta.getNombre(), myIP);
 		    myURI.setPort(5060);
 		    Address contactAddress = ini.address.createAddress(myURI);
-		    contactAddress.setDisplayName(cuenta.getNombre());
+		    contactAddress.setDisplayName(cuenta.getUsuario());
 		    ContactHeader contactHeader = ini.header.createContactHeader(contactAddress);
 	
 		    MaxForwardsHeader maxForwards = ini.header.createMaxForwardsHeader(5);
