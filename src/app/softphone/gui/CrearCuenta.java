@@ -34,7 +34,7 @@ public class CrearCuenta extends JDialog {
 	OperacionesCuenta op = new OperacionesCuenta();
 	OperacionesSip opSip = null;
 
-	public CrearCuenta(DefaultListModel<String> ln) {
+	public CrearCuenta(DefaultListModel<String> ln, OperacionesSip opSip) {
 		crearPanelDatos();
 		crearPanelBotones(ln,opSip);
 		crearVentana();

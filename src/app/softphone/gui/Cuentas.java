@@ -20,6 +20,7 @@ import javax.swing.event.ListSelectionListener;
 
 import app.softphone.core.cuentas.Cuenta;
 import app.softphone.core.cuentas.OperacionesCuenta;
+import app.softphone.core.sip.OperacionesSip;
 
 @SuppressWarnings("serial")
 public class Cuentas extends JPanel {
@@ -31,14 +32,14 @@ public class Cuentas extends JPanel {
 	DefaultListModel<String> ln;
 	JButton crCuenta, edCuenta, elCuenta; 
 	
-	public Cuentas() {
-		crearPanelLista();
+	public Cuentas(OperacionesSip opSip) {
+		crearPanelLista(opSip);
 		//crearPanelBotones();
 		add(panelLista, BorderLayout.WEST);
 		add(panelBotones, BorderLayout.CENTER);
 	}
 	
-	public void crearPanelLista() {
+	public void crearPanelLista(OperacionesSip opSip) {
 		lc = new ArrayList<Cuenta>();
 		ln = new DefaultListModel<String>();
  		panelLista = new JPanel();
@@ -53,11 +54,11 @@ public class Cuentas extends JPanel {
 		JScrollPane listScroller = new JScrollPane(lista);
 		listScroller.setPreferredSize(new Dimension(250, 320));
 		panelLista.add(listScroller, BorderLayout.CENTER);
-		crearPanelBotones(lista,ln);
+		crearPanelBotones(lista,ln,opSip);
 	}
 
 	
-	public void crearPanelBotones(JList<String> list, DefaultListModel<String> ln) {
+	public void crearPanelBotones(JList<String> list, DefaultListModel<String> ln, OperacionesSip opSip) {
 		panelBotones = new JPanel();
 		panelBotones.setLayout(new BoxLayout(panelBotones,BoxLayout.Y_AXIS));
 		crCuenta = new JButton();
@@ -80,9 +81,9 @@ public class Cuentas extends JPanel {
 		ActionListener crCuentaListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CrearCuenta editar = new CrearCuenta(ln);
-				editar.setLocationRelativeTo(panelLista);
-				editar.setVisible(true);
+				CrearCuenta crear = new CrearCuenta(ln,opSip);
+				crear.setLocationRelativeTo(panelLista);
+				crear.setVisible(true);
 			}
 		};
 		crCuenta.addActionListener(crCuentaListener);

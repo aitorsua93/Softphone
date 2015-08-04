@@ -10,6 +10,8 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import app.softphone.core.sip.OperacionesSip;
+
 @SuppressWarnings("serial")
 public class Preferencias extends JDialog {
 	
@@ -17,22 +19,16 @@ public class Preferencias extends JDialog {
 	JPanel cuenta, desvio, captura, panelBotones;
 	JButton aceptarPre, cancelarPre;
 	
-	public static void main(String[] args) {
-		Preferencias preferencias = new Preferencias();
-		preferencias.setLocationRelativeTo(null);
-		preferencias.setVisible(true);
-		
-	}
-	
-	public Preferencias() {
-		crearPestanas();
+
+	public Preferencias(OperacionesSip opSip) {
+		crearPestanas(opSip);
 		crearPanelBotones();
 		crearVentana();
 	}
 
-	public void crearPestanas() {
+	public void crearPestanas(OperacionesSip opSip) {
 		pestanas = new JTabbedPane();
-		cuenta = new Cuentas();
+		cuenta = new Cuentas(opSip);
 		desvio = new Desvio();
 		captura = new Captura();
 		pestanas.addTab("Cuentas", cuenta);

@@ -59,7 +59,7 @@ public class Principal{
 		ActionListener preferenciasListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Preferencias preferencias = new Preferencias();
+				Preferencias preferencias = new Preferencias(opSip);
 				preferencias.setLocationRelativeTo(ventana);
 				preferencias.setVisible(true);
 			}
