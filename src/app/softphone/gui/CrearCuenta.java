@@ -97,8 +97,7 @@ public class CrearCuenta extends JDialog {
 				p.setVisible(true);
 				opSip.register(nuevaCuenta,3600);
 				try {
-					Thread.sleep (2600);
-					p.dispose();
+					Thread.sleep (1200);
 				} catch (Exception ex) {
 					System.out.println(ex.getMessage());
 				}
