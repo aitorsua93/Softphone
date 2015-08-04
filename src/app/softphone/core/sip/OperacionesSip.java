@@ -171,6 +171,10 @@ public class OperacionesSip  implements SipListener {
 		        System.out.println("Sent request with authentication info:");
 		        System.out.println(request);
 	        }
+	        
+	        if (response.getStatusCode() == 403) {
+	        	System.out.println(response.getHeader("CSeq"));;
+	        }
 	      } catch (SipException e) { e.printStackTrace(); }
 	    }
 

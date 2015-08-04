@@ -1,20 +1,25 @@
 package app.softphone.core.cuentas;
 
+import app.softphone.core.cuentas.EstadoCuenta.Estado;
+
+
 public class Cuenta {
 	
 	String usuario, servidor, nombre;
 	String password;
+	Estado estado;
 	
 	
 	public Cuenta() {
 		
 	}
 	
-	public Cuenta(String usuario, String servidor, String password, String nombre) {
+	public Cuenta(String usuario, String servidor, String password, String nombre, Estado estado) {
 		this.usuario = usuario;
 		this.servidor = servidor;
 		this.password = password;
 		this.nombre = nombre;
+		this.estado = estado;
 	}
 	
 	public String getUsuario() {
@@ -33,6 +38,10 @@ public class Cuenta {
 		return nombre;
 	}
 	
+	public Estado getEstado() {
+		return estado;
+	}
+	
 	public void setUsuario(String usuario) {
 		this.usuario = usuario;
 	}
@@ -47,5 +56,9 @@ public class Cuenta {
 	
 	public void setNombre (String nombre) {
 		this.nombre = nombre;
+	}
+	
+	public void setEstado (Estado estado) {
+		this.estado= estado;
 	}
 }

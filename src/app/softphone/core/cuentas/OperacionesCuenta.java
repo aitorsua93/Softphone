@@ -21,25 +21,27 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import app.softphone.core.cuentas.EstadoCuenta.Estado;
+
 public class OperacionesCuenta {
 
 	
 	public static void main(String[] args) {
-		Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion");
-		Cuenta cuenta2 = new Cuenta("2222","192.168.1.100","456","Secretaria");
+		Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion",Estado.NO_REGISTRADO);
+		Cuenta cuenta2 = new Cuenta("2222","192.168.1.100","456","Secretaria",Estado.REGISTRADO);
 		OperacionesCuenta op = new OperacionesCuenta();
 		//op.crear(cuenta1);
 		//op.crear(cuenta2);
 		List<Cuenta> c = new ArrayList<Cuenta>();
 		Cuenta b;
 		//op.borrar("Santi");
-		op.crear(cuenta1);
-		op.crear(cuenta2);
+		//op.crear(cuenta1);
+		//op.crear(cuenta2);
 		c = op.buscarCuentas();
-		b = op.buscarCuenta("Secretaria");
-		System.out.println(b.getUsuario());
-		//System.out.println(c.get(0).getNombre());
-		//System.out.println(c.get(1).getNombre());
+		//b = op.buscarCuenta("Secretaria");
+		//System.out.println(b.getEstado().getDescr());
+		System.out.println(c.get(0).getEstado().getDescr());
+		System.out.println(c.get(1).getEstado().getDescr());
 	}
 	
 	
@@ -73,11 +75,15 @@ public class OperacionesCuenta {
 			Element nuevoNombre = doc.createElement("nombre");
 			nuevoNombre.setTextContent(cuenta.getNombre());
 			
+			Element nuevoEstado = doc.createElement("estado");
+			nuevoEstado.setTextContent(cuenta.getEstado().getDescr());
+			
 			//agregar etiquetas a la nueva cuenta
 			nuevaCuenta.appendChild(nuevoUsuario);
 			nuevaCuenta.appendChild(nuevoServidor);
 			nuevaCuenta.appendChild(nuevoPassword);
 			nuevaCuenta.appendChild(nuevoNombre);
+			nuevaCuenta.appendChild(nuevoEstado);
 			
 			//relacionar la nueva cuenta con la etiqueta "cuentas"
 			nodoRaiz.appendChild(nuevaCuenta);
@@ -132,6 +138,12 @@ public class OperacionesCuenta {
 					objCuenta.setServidor(obtenerNodoValor("servidor",unElemento));
 					objCuenta.setPassword(obtenerNodoValor("password",unElemento));
 					objCuenta.setNombre(obtenerNodoValor("nombre",unElemento));
+					String e = obtenerNodoValor("estado",unElemento);
+					if (e.equals(Estado.REGISTRADO.getDescr())) {
+						objCuenta.setEstado(Estado.REGISTRADO);
+					} else {
+						objCuenta.setEstado(Estado.NO_REGISTRADO);
+					}
 				
 					listaCuentas.add(objCuenta);
 				}
@@ -171,6 +183,12 @@ public class OperacionesCuenta {
 						objCuenta.setServidor(obtenerNodoValor("servidor",unElemento));
 						objCuenta.setPassword(obtenerNodoValor("password",unElemento));
 						objCuenta.setNombre(obtenerNodoValor("nombre",unElemento));
+						String e = obtenerNodoValor("estado",unElemento);
+						if (e.equals(Estado.REGISTRADO.getDescr())) {
+							objCuenta.setEstado(Estado.REGISTRADO);
+						} else {
+							objCuenta.setEstado(Estado.NO_REGISTRADO);
+						}
 					};
 				}
 			}
@@ -219,11 +237,16 @@ public class OperacionesCuenta {
 						Element nuevoNombre = doc.createElement("nombre");
 						nuevoNombre.setTextContent(cuentaAct.getNombre());
 						
+						Element nuevoEstado = doc.createElement("estado");
+						nuevoEstado.setTextContent(cuentaAct.getEstado().getDescr());
+						
+						
 						//agregar etiquetas a la nueva cuenta
 						nuevaCuenta.appendChild(nuevoUsuario);
 						nuevaCuenta.appendChild(nuevoServidor);
 						nuevaCuenta.appendChild(nuevoPassword);
 						nuevaCuenta.appendChild(nuevoNombre);
+						nuevaCuenta.appendChild(nuevoEstado);
 						
 						unElemento.getParentNode().replaceChild(nuevaCuenta, unElemento);
 					};

@@ -17,6 +17,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import app.softphone.core.cuentas.Cuenta;
+import app.softphone.core.cuentas.EstadoCuenta.Estado;
 import app.softphone.core.cuentas.OperacionesCuenta;
 import app.softphone.core.sip.OperacionesSip;
 
@@ -32,7 +33,6 @@ public class CrearCuenta extends JDialog {
 	Cuenta nuevaCuenta;
 	DefaultListModel<String> ln = new DefaultListModel<String>();;
 	OperacionesCuenta op = new OperacionesCuenta();
-	OperacionesSip opSip = null;
 
 	public CrearCuenta(DefaultListModel<String> ln, OperacionesSip opSip) {
 		crearPanelDatos();
@@ -88,7 +88,7 @@ public class CrearCuenta extends JDialog {
 				String servidor = servidorText.getText();
 				String password = passwordText.getText();//Temporal hasta encontrar solucion
 				String nombre = nombreText.getText();
-				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre);
+				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre,Estado.NO_REGISTRADO);
 				op.crear(nuevaCuenta);
 				ln.addElement(nombre + " <" + usuario + "@" + servidor + ">");
 				opSip.register(nuevaCuenta,3600);

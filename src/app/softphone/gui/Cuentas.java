@@ -87,7 +87,6 @@ public class Cuentas extends JPanel {
 			}
 		};
 		crCuenta.addActionListener(crCuentaListener);
-		
 		ActionListener edCuentaListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
