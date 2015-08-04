@@ -91,8 +91,14 @@ public class EditarCuenta extends JDialog{
 				ln.remove(index);
 				opSip.register(edCuenta, 0);
 				ln.add(index, nombre + " <" + usuario + "@" + servidor + ">");
-				opSip.register(nuevaCuenta, 3600);
 				dispose();
+				try {
+					Thread.sleep (1500);
+				} catch (Exception ex) {
+					System.out.println(ex.getMessage());
+				}
+				opSip.register(nuevaCuenta, 3600);
+				
 			}
 		};
 		aceptarCue.addActionListener(aceptarCueListener);
