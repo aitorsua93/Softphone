@@ -91,10 +91,14 @@ public class CrearCuenta extends JDialog {
 				String password = passwordText.getText();//Temporal hasta encontrar solucion
 				String nombre = nombreText.getText();
 				if (usuario.equals("") || servidor.equals("") || password.equals("") || usuario.equals("")) {
-					JOptionPane.showMessageDialog(panelBotones, "Hay que rellenar todos los campos","Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(panelDatos, "Hay que rellenar todos los campos","Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre,Estado.NO_REGISTRADO);
+				if (op.existeCuenta(nuevaCuenta)) {
+					JOptionPane.showMessageDialog(panelDatos, "El nombre de la cuenta es repetido o ya hay una cuenta asociada a ese usuario y servidor","Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				op.crear(nuevaCuenta);
 				dispose();
 				opSip.register(nuevaCuenta,3600);

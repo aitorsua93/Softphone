@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -87,11 +88,17 @@ public class EditarCuenta extends JDialog{
 				String servidor = servidorText.getText();
 				String password = passwordText.getText();//Temporal hasta encontrar solucion
 				String nombre = nombreText.getText();
+				if (usuario.equals("") || servidor.equals("") || password.equals("") || usuario.equals("")) {
+					JOptionPane.showMessageDialog(panelDatos, "Hay que rellenar todos los campos","Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre,Estado.NO_REGISTRADO);
+				if (op.existeCuenta(nuevaCuenta)) {
+					JOptionPane.showMessageDialog(panelDatos, "El nombre de la cuenta es repetido o ya hay una cuenta asociada a ese usuario y servidor","Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				op.actualizar(nuevaCuenta, edCuenta.getNombre());
 				opSip.register(edCuenta, 0);
-				ln.remove(index);
-				ln.add(index, nombre + " | <" + usuario + "@" + servidor + "> | Registrando...");
 				dispose();
 				try {
 					Thread.sleep (400);
