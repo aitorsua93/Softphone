@@ -118,6 +118,8 @@ public class OperacionesSip  implements SipListener {
 			  Address contactAddress = address.createAddress(myURI);
 			  ContactHeader contactHeader = header.createContactHeader(contactAddress);
 	
+			  System.out.println("111111111111111111111111111111111111111111111111111111");
+			  
 			  MaxForwardsHeader maxForwards = header.createMaxForwardsHeader(5);
 	
 			  List<ViaHeader> viaHeaders = new ArrayList<>();
@@ -125,11 +127,13 @@ public class OperacionesSip  implements SipListener {
 			  long seq = 1;
 			  CSeqHeader cSeqHeader = header.createCSeqHeader(seq++, Request.SUBSCRIBE);
 			  ToHeader toHeader = header.createToHeader(fromAddress, null);
-			  URI requestURI = address.createURI("sip:"+asteriskIp+":"+asteriskPort+";maddr="+asteriskIp);
+			  URI requestURI = address.createURI("sip:asterisk@"+asteriskIp+":"+asteriskPort+";maddr="+asteriskIp);
 		    
-	
+			  System.out.println("2222222222222222222222222222222222222222222222222222222");
+			  
 			  Request request = message.createRequest(requestURI, Request.SUBSCRIBE, callIdHeader,
 		            cSeqHeader, fromHeader, toHeader, viaHeaders, maxForwards);
+			  System.out.println("333333333333333333333333333333333333333333333333333333333333333");
 			  request.addHeader(contactHeader);
 			  EventHeader event = header.createEventHeader("message-summary");
 			  request.addHeader(event);
@@ -137,6 +141,7 @@ public class OperacionesSip  implements SipListener {
 			  request.addHeader(eh);
 			  ClientTransaction transaction = udp.getNewClientTransaction(request);
 			  transaction.sendRequest();
+			  System.out.println("4444444444444444444444444444444444444444444444444444444444444444");
 			  System.out.println("Sent request:");
 			  System.out.println(request);
 		  } catch(Exception e) {
