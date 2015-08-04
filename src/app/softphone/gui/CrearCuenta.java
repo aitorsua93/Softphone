@@ -93,6 +93,11 @@ public class CrearCuenta extends JDialog {
 				ln.addElement(nombre + " | <" + usuario + "@" + servidor + "> | Registrando...");
 				dispose();
 				opSip.register(nuevaCuenta,3600);
+				try {
+					Thread.sleep (1500);
+				} catch (Exception ex) {
+					System.out.println(ex.getMessage());
+				}
 				nuevaCuenta = op.buscarCuenta(nuevaCuenta.getNombre());
 				ln.remove(ln.size()-1);
 				ln.addElement(nombre + " | <" + usuario + "@" + servidor + "> | " + nuevaCuenta.getEstado().getDescr());

@@ -111,7 +111,7 @@ public class Cuentas extends JPanel {
 				ln.remove(index);
 				Cuenta cuenta = op.buscarCuenta(nombre[0]);
 				op.borrar(nombre[0]);
-				if (cuenta.getEstado().equals(Estado.REGISTRADO)) {
+				if (cuenta.getEstado().getDescr().equals(Estado.REGISTRADO.getDescr())) {
 					opSip.register(cuenta,0);
 					//opSip.subscribe(cuenta);
 				}
