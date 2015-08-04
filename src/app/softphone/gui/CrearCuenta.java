@@ -92,6 +92,7 @@ public class CrearCuenta extends JDialog {
 				String nombre = nombreText.getText();
 				if (usuario.equals("") || servidor.equals("") || password.equals("") || usuario.equals("")) {
 					JOptionPane.showMessageDialog(panelBotones, "Hay que rellenar todos los campos","Error", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre,Estado.NO_REGISTRADO);
 				op.crear(nuevaCuenta);
