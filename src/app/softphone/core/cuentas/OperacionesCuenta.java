@@ -26,15 +26,19 @@ public class OperacionesCuenta {
 	
 	public static void main(String[] args) {
 		Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion");
-		//Cuenta cuenta2 = new Cuenta("2222","192.168.1.100","456","Secretaria");
+		Cuenta cuenta2 = new Cuenta("2222","192.168.1.100","456","Secretaria");
 		OperacionesCuenta op = new OperacionesCuenta();
 		//op.crear(cuenta1);
 		//op.crear(cuenta2);
 		List<Cuenta> c = new ArrayList<Cuenta>();
+		Cuenta b;
 		//op.borrar("Santi");
-		op.actualizar(cuenta1, "Aitor");
+		op.crear(cuenta1);
+		op.crear(cuenta2);
 		c = op.buscarCuentas();
-		System.out.println(c.get(0).getNombre());
+		b = op.buscarCuenta("Secretaria");
+		System.out.println(b.getUsuario());
+		//System.out.println(c.get(0).getNombre());
 		//System.out.println(c.get(1).getNombre());
 	}
 	

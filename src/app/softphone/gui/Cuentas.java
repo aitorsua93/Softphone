@@ -109,8 +109,8 @@ public class Cuentas extends JPanel {
 				int index = list.getSelectedIndex();
 				String[] nombre = c.split("\\s+");
 				ln.remove(index);
-				op.borrar(nombre[0]);
 				Cuenta cuenta = op.buscarCuenta(nombre[0]);
+				op.borrar(nombre[0]);
 				opSip.register(cuenta,0);
 				//opSip.subscribe(cuenta);
 			}
