@@ -89,9 +89,9 @@ public class EditarCuenta extends JDialog{
 				String nombre = nombreText.getText();
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre,Estado.NO_REGISTRADO);
 				op.actualizar(nuevaCuenta, edCuenta.getNombre());
-				ln.remove(index);
 				opSip.register(edCuenta, 0);
-				ln.add(index, nombre + " <" + usuario + "@" + servidor + ">");
+				ln.remove(index);
+				ln.add(index, nombre + " | <" + usuario + "@" + servidor + "> | Registrando...");
 				dispose();
 				try {
 					Thread.sleep (1500);
@@ -99,6 +99,14 @@ public class EditarCuenta extends JDialog{
 					System.out.println(ex.getMessage());
 				}
 				opSip.register(nuevaCuenta, 3600);
+				try {
+					Thread.sleep (1500);
+				} catch (Exception ex) {
+					System.out.println(ex.getMessage());
+				}
+				nuevaCuenta = op.buscarCuenta(nuevaCuenta.getNombre());
+				ln.remove(index);
+				ln.add(index, nombre + " | <" + usuario + "@" + servidor + "> | " + nuevaCuenta.getEstado().getDescr());
 				
 			}
 		};

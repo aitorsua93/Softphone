@@ -90,9 +90,12 @@ public class CrearCuenta extends JDialog {
 				String nombre = nombreText.getText();
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre,Estado.NO_REGISTRADO);
 				op.crear(nuevaCuenta);
-				ln.addElement(nombre + " <" + usuario + "@" + servidor + ">");
-				opSip.register(nuevaCuenta,3600);
+				ln.addElement(nombre + " | <" + usuario + "@" + servidor + "> | Registrando...");
 				dispose();
+				opSip.register(nuevaCuenta,3600);
+				nuevaCuenta = op.buscarCuenta(nuevaCuenta.getNombre());
+				ln.remove(ln.size()-1);
+				ln.addElement(nombre + " | <" + usuario + "@" + servidor + "> | " + nuevaCuenta.getEstado().getDescr());
 			}
 		};
 		aceptarCue.addActionListener(aceptarCueListener);

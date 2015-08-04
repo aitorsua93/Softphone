@@ -19,6 +19,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import app.softphone.core.cuentas.Cuenta;
+import app.softphone.core.cuentas.EstadoCuenta.Estado;
 import app.softphone.core.cuentas.OperacionesCuenta;
 import app.softphone.core.sip.OperacionesSip;
 
@@ -45,7 +46,7 @@ public class Cuentas extends JPanel {
  		panelLista = new JPanel();
 		lc = op.buscarCuentas();
 		for (int i=0;i<lc.size();i++) {
-			ln.addElement(lc.get(i).getNombre() + " <" + lc.get(i).getUsuario() + "@" + lc.get(i).getServidor() + ">");
+			ln.addElement(lc.get(i).getNombre() + " | <" + lc.get(i).getUsuario() + "@" + lc.get(i).getServidor() + "> | " + lc.get(i).getEstado().getDescr());
 		}
 		JList<String> lista = new JList<String>(ln);
 		lista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -110,8 +111,10 @@ public class Cuentas extends JPanel {
 				ln.remove(index);
 				Cuenta cuenta = op.buscarCuenta(nombre[0]);
 				op.borrar(nombre[0]);
-				opSip.register(cuenta,0);
-				//opSip.subscribe(cuenta);
+				if (cuenta.getEstado().equals(Estado.REGISTRADO)) {
+					opSip.register(cuenta,0);
+					//opSip.subscribe(cuenta);
+				}
 			}
 		};
 		elCuenta.addActionListener(elCuentaListener);

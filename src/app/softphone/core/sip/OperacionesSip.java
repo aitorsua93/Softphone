@@ -9,6 +9,7 @@ import javax.sip.header.*;
 import javax.sip.message.*;
 
 import app.softphone.core.cuentas.Cuenta;
+import app.softphone.core.cuentas.EstadoCuenta.Estado;
 import app.softphone.core.cuentas.OperacionesCuenta;
 
 import java.util.*;
@@ -27,6 +28,7 @@ public class OperacionesSip  implements SipListener {
 	  private final int asteriskPort = 5060;
 	  private final String tag = "fiewujgf489t6d23lkfd-dsfg8g125";
 	  OperacionesCuenta op = new OperacionesCuenta();
+	  Cuenta cuentaGlob;
 
 	  public static void main(String[] args) throws Exception {
 	    //OperacionesSip os = new OperacionesSip();
@@ -69,6 +71,7 @@ public class OperacionesSip  implements SipListener {
 	  
 	  public void register(Cuenta cuenta, int expires) {
 		  try {
+			  cuentaGlob = cuenta;
 			  sipId = cuenta.getUsuario();
 			  asteriskIp = cuenta.getServidor();
 			  myPw = cuenta.getPassword(); 
@@ -172,8 +175,12 @@ public class OperacionesSip  implements SipListener {
 		        System.out.println(request);
 	        }
 	        
-	        if (response.getStatusCode() == 403) {
-	        	System.out.println(response.getHeader("CSeq"));;
+	        if (response.getStatusCode() == 200) {
+	        	String[] cSeq = response.getHeader("CSeq").toString().split("\\s+");
+	        	if (cSeq[2].equals("REGISTER")) {
+	        		cuentaGlob.setEstado(Estado.REGISTRADO);
+	        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
+	        	}
 	        }
 	      } catch (SipException e) { e.printStackTrace(); }
 	    }
