@@ -9,6 +9,7 @@ import javax.sip.header.*;
 import javax.sip.message.*;
 
 import app.softphone.core.cuentas.Cuenta;
+import app.softphone.core.cuentas.OperacionesCuenta;
 
 import java.util.*;
 
@@ -25,6 +26,7 @@ public class OperacionesSip  implements SipListener {
 	  String asteriskIp;
 	  private final int asteriskPort = 5060;
 	  private final String tag = "fiewujgf489t6d23lkfd-dsfg8g125";
+	  OperacionesCuenta op = new OperacionesCuenta();
 
 	  public static void main(String[] args) throws Exception {
 	    //OperacionesSip os = new OperacionesSip();
@@ -47,6 +49,19 @@ public class OperacionesSip  implements SipListener {
 		  ListeningPoint udpPoint = sipStack.createListeningPoint(myIp, myPort, "udp");
 		  udp = sipStack.createSipProvider(udpPoint);
 		  udp.addSipListener(this);
+		  TimerTask registerTask = new TimerTask() 
+		     { 
+		         public void run()  
+		         { 
+		            List<Cuenta> lc = new ArrayList<Cuenta>();
+		            lc = op.buscarCuentas();
+		            for (int i=0;i<lc.size();i++) {
+		            	register(lc.get(i));
+		            }
+		         } 
+		     }; 
+		  Timer timer = new Timer();
+		  timer.scheduleAtFixedRate(registerTask, 0, 50000);
 		  } catch(Exception e) {
 			  System.out.println(e.getMessage());
 		  }
