@@ -93,7 +93,7 @@ public class OperacionesSip  implements SipListener {
 			  Request request = message.createRequest(requestURI, Request.REGISTER, callIdHeader,
 		            cSeqHeader, fromHeader, toHeader, viaHeaders, maxForwards);
 			  request.addHeader(contactHeader);
-			  ExpiresHeader eh = header.createExpiresHeader(300);
+			  ExpiresHeader eh = header.createExpiresHeader(3600);
 			  request.addHeader(eh);
 			  ClientTransaction transaction = udp.getNewClientTransaction(request);
 			  transaction.sendRequest();

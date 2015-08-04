@@ -63,7 +63,7 @@ public class CrearCuenta extends JDialog {
 		servidorText = new JTextField();
 		panelDatos.add(servidorText);
 	
-		passwordLabel = new JLabel("Contraseña:");
+		passwordLabel = new JLabel("ContraseÃ±a:");
 		panelDatos.add(passwordLabel);
 		passwordText = new JPasswordField();
 		panelDatos.add(passwordText);
