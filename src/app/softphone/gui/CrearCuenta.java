@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -89,6 +90,9 @@ public class CrearCuenta extends JDialog {
 				String servidor = servidorText.getText();
 				String password = passwordText.getText();//Temporal hasta encontrar solucion
 				String nombre = nombreText.getText();
+				if (usuario.equals("") || servidor.equals("") || password.equals("") || usuario.equals("")) {
+					JOptionPane.showMessageDialog(panelBotones, "Hay que rellenar todos los campos","Error", JOptionPane.ERROR_MESSAGE);
+				}
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre,Estado.NO_REGISTRADO);
 				op.crear(nuevaCuenta);
 				dispose();
