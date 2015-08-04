@@ -61,7 +61,7 @@ public class OperacionesSip  implements SipListener {
 		         } 
 		     }; 
 		  Timer timer = new Timer();
-		  timer.scheduleAtFixedRate(registerTask, 0, 50000);
+		  timer.scheduleAtFixedRate(registerTask, 0, 500000);
 		  } catch(Exception e) {
 			  System.out.println(e.getMessage());
 		  }
