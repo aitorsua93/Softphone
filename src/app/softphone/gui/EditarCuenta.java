@@ -58,7 +58,7 @@ public class EditarCuenta extends JDialog{
 		servidorText.setText(edCuenta.getServidor());
 		panelDatos.add(servidorText);
 	
-		passwordLabel = new JLabel("Contraseña:");
+		passwordLabel = new JLabel("Contraseï¿½a:");
 		panelDatos.add(passwordLabel);
 		
 		passwordText = new JPasswordField();
@@ -94,7 +94,7 @@ public class EditarCuenta extends JDialog{
 				ln.add(index, nombre + " | <" + usuario + "@" + servidor + "> | Registrando...");
 				dispose();
 				try {
-					Thread.sleep (1500);
+					Thread.sleep (400);
 				} catch (Exception ex) {
 					System.out.println(ex.getMessage());
 				}
