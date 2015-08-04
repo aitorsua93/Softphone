@@ -11,6 +11,7 @@ import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -90,8 +91,10 @@ public class CrearCuenta extends JDialog {
 				String nombre = nombreText.getText();
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre,Estado.NO_REGISTRADO);
 				op.crear(nuevaCuenta);
-				ln.addElement(nombre + " | <" + usuario + "@" + servidor + "> | Registrando...");
 				dispose();
+				Progreso p = new Progreso();
+				p.setLocationRelativeTo(panelBotones);
+				p.setVisible(true);
 				opSip.register(nuevaCuenta,3600);
 				try {
 					Thread.sleep (3000);
@@ -99,8 +102,8 @@ public class CrearCuenta extends JDialog {
 					System.out.println(ex.getMessage());
 				}
 				nuevaCuenta = op.buscarCuenta(nuevaCuenta.getNombre());
-				ln.remove(ln.size()-1);
 				ln.addElement(nombre + " | <" + usuario + "@" + servidor + "> | " + nuevaCuenta.getEstado().getDescr());
+				p.dispose();
 			}
 		};
 		aceptarCue.addActionListener(aceptarCueListener);

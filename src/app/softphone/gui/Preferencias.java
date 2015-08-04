@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.WindowConstants;
 
 import app.softphone.core.sip.OperacionesSip;
 
@@ -58,6 +59,7 @@ public class Preferencias extends JDialog {
 	
 	public void crearVentana() {
 		setTitle("Preferencias");
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(500,500);
 		setModal(true);
 		add(pestanas, BorderLayout.CENTER);
