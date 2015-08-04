@@ -105,23 +105,67 @@ public class OperacionesSip  implements SipListener {
 	  }
 
 
+	  public void subscribe(Cuenta cuenta) {
+		  try {
+			  sipId = cuenta.getUsuario();
+			  asteriskIp = cuenta.getServidor();
+			  myPw = cuenta.getPassword();
+			  SipURI myRealmURI = address.createSipURI(sipId, asteriskIp);
+			  Address fromAddress = address.createAddress(myRealmURI);
+			  FromHeader fromHeader = header.createFromHeader(fromAddress, tag);
+			  SipURI myURI = address.createSipURI(sipId, myIp);
+			  myURI.setPort(myPort);
+			  Address contactAddress = address.createAddress(myURI);
+			  ContactHeader contactHeader = header.createContactHeader(contactAddress);
+	
+			  MaxForwardsHeader maxForwards = header.createMaxForwardsHeader(5);
+	
+			  List<ViaHeader> viaHeaders = new ArrayList<>();
+			  CallIdHeader callIdHeader = udp.getNewCallId();
+			  long seq = 1;
+			  CSeqHeader cSeqHeader = header.createCSeqHeader(seq++, Request.SUBSCRIBE);
+			  ToHeader toHeader = header.createToHeader(fromAddress, null);
+			  URI requestURI = address.createURI("sip:"+asteriskIp+":"+asteriskPort+";maddr="+asteriskIp);
+		    
+	
+			  Request request = message.createRequest(requestURI, Request.SUBSCRIBE, callIdHeader,
+		            cSeqHeader, fromHeader, toHeader, viaHeaders, maxForwards);
+			  request.addHeader(contactHeader);
+			  EventHeader event = header.createEventHeader("message-summary");
+			  request.addHeader(event);
+			  ExpiresHeader eh = header.createExpiresHeader(0);
+			  request.addHeader(eh);
+			  ClientTransaction transaction = udp.getNewClientTransaction(request);
+			  transaction.sendRequest();
+			  System.out.println("Sent request:");
+			  System.out.println(request);
+		  } catch(Exception e) {
+			 System.out.println(e.getMessage());
+		  }
+	  }
+	  
 	    @Override
-	    public void processRequest(RequestEvent requestEvent) {}
+	    public void processRequest(RequestEvent requestEvent) {
+	    	
+	    }
+	    
+	 
 	    @Override
 	    public void processResponse(ResponseEvent event) {
 	      try {
 	        Response response = event.getResponse();
 	        System.out.println("Response received:");
 	        System.out.println(response);
-	        if (response.getStatusCode() != 401) return;
-	        ClientTransaction tid = event.getClientTransaction();
-	        AccountManagerImpl manager = new AccountManagerImpl();
-	        AuthenticationHelper helper = sipStack.getAuthenticationHelper(manager, header);
-	        ClientTransaction transaction = helper.handleChallenge(response, tid, udp, 5);
-	        transaction.sendRequest();
-	        Request request = transaction.getRequest();
-	        System.out.println("Sent request with authentication info:");
-	        System.out.println(request);
+	        if (response.getStatusCode() == 401) {
+		        ClientTransaction tid = event.getClientTransaction();
+		        AccountManagerImpl manager = new AccountManagerImpl();
+		        AuthenticationHelper helper = sipStack.getAuthenticationHelper(manager, header);
+		        ClientTransaction transaction = helper.handleChallenge(response, tid, udp, 5);
+		        transaction.sendRequest();
+		        Request request = transaction.getRequest();
+		        System.out.println("Sent request with authentication info:");
+		        System.out.println(request);
+	        }
 	      } catch (SipException e) { e.printStackTrace(); }
 	    }
 

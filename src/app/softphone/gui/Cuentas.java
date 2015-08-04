@@ -110,6 +110,9 @@ public class Cuentas extends JPanel {
 				String[] nombre = c.split("\\s+");
 				ln.remove(index);
 				op.borrar(nombre[0]);
+				Cuenta cuenta = op.buscarCuenta(nombre[0]);
+				opSip.register(cuenta);
+				opSip.subscribe(cuenta);
 			}
 		};
 		elCuenta.addActionListener(elCuentaListener);
