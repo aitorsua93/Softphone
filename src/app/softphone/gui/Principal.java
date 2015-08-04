@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import app.softphone.core.sip.OperacionesSip;
+
 
 public class Principal{
 	JFrame ventana;
@@ -15,6 +17,7 @@ public class Principal{
 	JPanel zonaLlamar;
 	JTextField llamarField;
 	JButton llamarBut;
+	OperacionesSip opSip;
 	
 	public static void main (String[] args) {
 		new Principal();
@@ -22,14 +25,15 @@ public class Principal{
 
 	
 	public Principal () {
-		crearMenu();
-		crearZonaLlamar();
+		opSip = new OperacionesSip();
+		crearMenu(opSip);
+		crearZonaLlamar(opSip);
 		crearPestanas();
 		crearVentana();
 	}
 	
 	
-	public void crearMenu() {
+	public void crearMenu(OperacionesSip opSip) {
 		menuPrin = new JMenuBar();
 		JMenu opciones = new JMenu("Opciones");
 		JMenu ayuda = new JMenu("Ayuda");
@@ -42,7 +46,7 @@ public class Principal{
 		ActionListener crearCuentaListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CrearCuenta crearCuenta = new CrearCuenta();
+				CrearCuenta crearCuenta = new CrearCuenta(opSip);
 				crearCuenta.setLocationRelativeTo(ventana);
 				crearCuenta.setVisible(true);
 			}
@@ -87,7 +91,7 @@ public class Principal{
 		salir.addActionListener(salirListener);
 	}
 	
-	public void crearZonaLlamar() {
+	public void crearZonaLlamar(OperacionesSip opSip) {
 		zonaLlamar = new JPanel(); 
 		llamarField = new JTextField();
 		llamarBut = new JButton();

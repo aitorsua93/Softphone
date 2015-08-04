@@ -1,31 +1,34 @@
 package app.softphone.core.sip;
 
-	import gov.nist.javax.sip.SipStackExt;
-	import gov.nist.javax.sip.clientauthutils.*;
+import gov.nist.javax.sip.SipStackExt;
+import gov.nist.javax.sip.clientauthutils.*;
 
-	import javax.sip.*;
-	import javax.sip.address.*;
-	import javax.sip.header.*;
-	import javax.sip.message.*;
-	import java.util.*;
+import javax.sip.*;
+import javax.sip.address.*;
+import javax.sip.header.*;
+import javax.sip.message.*;
 
-	public class OperacionesSip {
-	  private SipStackExt sipStack;
-	  private HeaderFactory header;
-	  private SipProvider udp;
-	  private AddressFactory address;
-	  private MessageFactory message;
-	  private final String sipId = "8001";
+import app.softphone.core.cuentas.Cuenta;
+
+import java.util.*;
+
+public class OperacionesSip  implements SipListener {
+	  SipStackExt sipStack;
+	  HeaderFactory header;
+	  SipProvider udp;
+	  AddressFactory address;
+	  MessageFactory message;
+	  String sipId;
 	  private final String myIp = "192.168.1.101";
 	  private final int myPort = 5060;
-	  private final String myPw = "123";
-	  private final String realm = "aitorCommunications";
-	  private final String asteriskIp = "192.168.1.100";
+	  String myPw;
+	  String asteriskIp;
 	  private final int asteriskPort = 5060;
 	  private final String tag = "fiewujgf489t6d23lkfd-dsfg8g125";
 
 	  public static void main(String[] args) throws Exception {
-	    new OperacionesSip().register();
+	    //OperacionesSip os = new OperacionesSip();
+	    //os.register();
 	  }
 
 	  
@@ -39,31 +42,27 @@ package app.softphone.core.sip;
 		    //properties.setProperty("javax.sip.OUTBOUND_PROXY", asteriskIp+":"+asteriskPort+"/udp");
 		  this.sipStack = (SipStackExt) sipFactory.createSipStack(properties);	
 		  header = sipFactory.createHeaderFactory();
-		  AddressFactory address = sipFactory.createAddressFactory();
-		  MessageFactory message = sipFactory.createMessageFactory();
+		  address = sipFactory.createAddressFactory();
+		  message = sipFactory.createMessageFactory();
+		  ListeningPoint udpPoint = sipStack.createListeningPoint(myIp, myPort, "udp");
+		  udp = sipStack.createSipProvider(udpPoint);
+		  udp.addSipListener(this);
 		  } catch(Exception e) {
 			  System.out.println(e.getMessage());
 		  }
 	  }
 	  
-	  public void register() {
+	  public void register(Cuenta cuenta) {
 		  try {
-			  ListeningPoint udpPoint = sipStack.createListeningPoint(myIp, myPort, "udp");
-	
-			  MySIPListener listener = new MySIPListener();
-	
-			  udp = sipStack.createSipProvider(udpPoint);
-			  udp.addSipListener(listener);
-	
-			  SipURI myRealmURI = address.createSipURI(sipId, realm);
+			  sipId = cuenta.getUsuario();
+			  asteriskIp = cuenta.getServidor();
+			  myPw = cuenta.getPassword(); 
+			  SipURI myRealmURI = address.createSipURI(sipId, asteriskIp);
 			  Address fromAddress = address.createAddress(myRealmURI);
-			  fromAddress.setDisplayName(sipId);
 			  FromHeader fromHeader = header.createFromHeader(fromAddress, tag);
-	
 			  SipURI myURI = address.createSipURI(sipId, myIp);
 			  myURI.setPort(myPort);
 			  Address contactAddress = address.createAddress(myURI);
-			  contactAddress.setDisplayName(sipId);
 			  ContactHeader contactHeader = header.createContactHeader(contactAddress);
 	
 			  MaxForwardsHeader maxForwards = header.createMaxForwardsHeader(5);
@@ -90,7 +89,7 @@ package app.softphone.core.sip;
 		}
 	  }
 
-	  private class MySIPListener implements SipListener {
+
 	    @Override
 	    public void processRequest(RequestEvent requestEvent) {}
 	    @Override
@@ -119,7 +118,7 @@ package app.softphone.core.sip;
 	    public void processTransactionTerminated(TransactionTerminatedEvent transactionTerminatedEvent) {}
 	    @Override
 	    public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {}
-	  }
+	 
 
 	  private class AccountManagerImpl implements AccountManager {
 	    @Override
@@ -130,7 +129,7 @@ package app.softphone.core.sip;
 	        @Override
 	        public String getPassword() { return myPw; }
 	        @Override
-	        public String getSipDomain() { return realm; }
+	        public String getSipDomain() { return asteriskIp; }
 	      };
 	    }
 	  }
