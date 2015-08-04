@@ -99,11 +99,9 @@ public class EditarCuenta extends JDialog{
 					System.out.println(ex.getMessage());
 				}
 				opSip.register(nuevaCuenta, 3600);
-				try {
-					Thread.sleep (3000);
-				} catch (Exception ex) {
-					System.out.println(ex.getMessage());
-				}
+				Progreso p = new Progreso();
+				p.setLocationRelativeTo(panelBotones);
+				p.setVisible(true);
 				nuevaCuenta = op.buscarCuenta(nuevaCuenta.getNombre());
 				ln.remove(index);
 				ln.add(index, nombre + " | <" + usuario + "@" + servidor + "> | " + nuevaCuenta.getEstado().getDescr());

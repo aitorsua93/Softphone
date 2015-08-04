@@ -31,7 +31,7 @@ public class Progreso extends JDialog{
 		progress = new JProgressBar();
 		progress.setVisible(true);
 		progress.setIndeterminate(true);
-		final Timer t = new Timer(1500, new ActionListener() {
+		final Timer t = new Timer(2000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				((Timer)e.getSource()).stop();
