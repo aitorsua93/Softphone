@@ -91,7 +91,7 @@ public class CrearCuenta extends JDialog {
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre);
 				op.crear(nuevaCuenta);
 				ln.addElement(nombre + " <" + usuario + "@" + servidor + ">");
-				opSip.register(nuevaCuenta);
+				opSip.register(nuevaCuenta,3600);
 				dispose();
 			}
 		};

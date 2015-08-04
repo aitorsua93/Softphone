@@ -111,8 +111,8 @@ public class Cuentas extends JPanel {
 				ln.remove(index);
 				op.borrar(nombre[0]);
 				Cuenta cuenta = op.buscarCuenta(nombre[0]);
-				opSip.register(cuenta);
-				opSip.subscribe(cuenta);
+				opSip.register(cuenta,0);
+				//opSip.subscribe(cuenta);
 			}
 		};
 		elCuenta.addActionListener(elCuentaListener);

@@ -56,7 +56,7 @@ public class OperacionesSip  implements SipListener {
 		            List<Cuenta> lc = new ArrayList<Cuenta>();
 		            lc = op.buscarCuentas();
 		            for (int i=0;i<lc.size();i++) {
-		            	register(lc.get(i));
+		            	register(lc.get(i),3600);
 		            }
 		         } 
 		     }; 
@@ -67,7 +67,7 @@ public class OperacionesSip  implements SipListener {
 		  }
 	  }
 	  
-	  public void register(Cuenta cuenta) {
+	  public void register(Cuenta cuenta, int expires) {
 		  try {
 			  sipId = cuenta.getUsuario();
 			  asteriskIp = cuenta.getServidor();
@@ -93,7 +93,7 @@ public class OperacionesSip  implements SipListener {
 			  Request request = message.createRequest(requestURI, Request.REGISTER, callIdHeader,
 		            cSeqHeader, fromHeader, toHeader, viaHeaders, maxForwards);
 			  request.addHeader(contactHeader);
-			  ExpiresHeader eh = header.createExpiresHeader(3600);
+			  ExpiresHeader eh = header.createExpiresHeader(expires);
 			  request.addHeader(eh);
 			  ClientTransaction transaction = udp.getNewClientTransaction(request);
 			  transaction.sendRequest();
