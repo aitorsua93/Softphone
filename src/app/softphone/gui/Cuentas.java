@@ -95,7 +95,7 @@ public class Cuentas extends JPanel {
 				int index = list.getSelectedIndex();
 				String[] nombre = c.split("\\s+");
 				Cuenta cuentaEd = op.buscarCuenta(nombre[0]);
-				EditarCuenta editar = new EditarCuenta(cuentaEd,ln,index);
+				EditarCuenta editar = new EditarCuenta(cuentaEd,ln,index,opSip);
 				editar.setLocationRelativeTo(panelLista);
 				editar.setVisible(true);
 			}

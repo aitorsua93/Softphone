@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 
 import app.softphone.core.cuentas.Cuenta;
 import app.softphone.core.cuentas.OperacionesCuenta;
+import app.softphone.core.sip.OperacionesSip;
 
 @SuppressWarnings("serial")
 public class EditarCuenta extends JDialog{
@@ -31,9 +32,9 @@ public class EditarCuenta extends JDialog{
 	Cuenta nuevaCuenta;
 	OperacionesCuenta op = new OperacionesCuenta();
 
-	public EditarCuenta(Cuenta edCuenta,DefaultListModel<String> ln, int index) {
+	public EditarCuenta(Cuenta edCuenta,DefaultListModel<String> ln, int index, OperacionesSip opSip) {
 		crearPanelDatos(edCuenta);
-		crearPanelBotones(edCuenta,ln,index);
+		crearPanelBotones(edCuenta,ln,index,opSip);
 		crearVentana();
 	}
 	
@@ -72,7 +73,7 @@ public class EditarCuenta extends JDialog{
 	}
 	
 
-	public void crearPanelBotones(Cuenta edCuenta,DefaultListModel<String> ln, int index) {
+	public void crearPanelBotones(Cuenta edCuenta,DefaultListModel<String> ln, int index, OperacionesSip opSip) {
 		panelBotones = new JPanel(new FlowLayout());
 		
 		aceptarCue = new JButton();
@@ -88,7 +89,9 @@ public class EditarCuenta extends JDialog{
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre);
 				op.actualizar(nuevaCuenta, edCuenta.getNombre());
 				ln.remove(index);
+				opSip.register(edCuenta, 0);
 				ln.add(index, nombre + " <" + usuario + "@" + servidor + ">");
+				opSip.register(nuevaCuenta, 3600);
 				dispose();
 			}
 		};
