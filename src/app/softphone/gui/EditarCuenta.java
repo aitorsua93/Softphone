@@ -100,7 +100,7 @@ public class EditarCuenta extends JDialog{
 				}
 				opSip.register(nuevaCuenta, 3600);
 				try {
-					Thread.sleep (1500);
+					Thread.sleep (3000);
 				} catch (Exception ex) {
 					System.out.println(ex.getMessage());
 				}
