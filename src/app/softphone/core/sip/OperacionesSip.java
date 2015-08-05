@@ -182,7 +182,8 @@ public class OperacionesSip  implements SipListener {
 	        
 	        if (response.getStatusCode() == 200) {
 	        	String[] cSeq = response.getHeader("CSeq").toString().split("\\s+");
-	        	if (cSeq[2].equals("REGISTER")) {
+	        	String[] expires = response.getExpires().toString().split("\\s+");
+	        	if (cSeq[2].equals("REGISTER") && !(expires[1].equals("0")) ) {
 	        		cuentaGlob.setEstado(Estado.REGISTRADO);
 	        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
 	        	}

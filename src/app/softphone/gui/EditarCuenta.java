@@ -109,7 +109,7 @@ public class EditarCuenta extends JDialog{
 				Progreso p = new Progreso();
 				p.setLocationRelativeTo(panelBotones);
 				p.setVisible(true);
-				nuevaCuenta = op.buscarCuenta(nuevaCuenta.getNombre());
+				nuevaCuenta = op.buscarCuenta(nombre);
 				ln.remove(index);
 				ln.add(index, nombre + " | <" + usuario + "@" + servidor + "> | " + nuevaCuenta.getEstado().getDescr());
 				
