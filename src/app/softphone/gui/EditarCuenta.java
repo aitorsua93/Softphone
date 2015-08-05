@@ -93,7 +93,7 @@ public class EditarCuenta extends JDialog{
 					return;
 				}
 				nuevaCuenta = new Cuenta(usuario,servidor,password,nombre,Estado.NO_REGISTRADO);
-				if (op.existeCuenta(nuevaCuenta)) {
+				if (op.existeCuenta(nuevaCuenta,edCuenta)) {
 					JOptionPane.showMessageDialog(panelDatos, "El nombre de la cuenta es repetido o ya hay una cuenta asociada a ese usuario y servidor","Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}

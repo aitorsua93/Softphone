@@ -204,7 +204,7 @@ public class OperacionesCuenta {
 		return objCuenta;
 	}
 	
-	public Boolean existeCuenta(Cuenta compCuenta) {
+	public Boolean existeCuenta(Cuenta compCuenta, Cuenta editar) {
 		Boolean existe = false;
 		try {
 			//clases necesarias para leer XML
@@ -224,12 +224,25 @@ public class OperacionesCuenta {
 					String u = obtenerNodoValor("usuario",unElemento);
 					String s = obtenerNodoValor("servidor",unElemento);
 					String n = obtenerNodoValor("nombre",unElemento);
-					if (u.equals(compCuenta.getUsuario()) && s.equals(compCuenta.getServidor())) {
-						existe = true;
-					} 
-					if (n.equals(compCuenta.getNombre())) {
-						existe = true;
+					if (editar == null) {
+						if (u.equals(compCuenta.getUsuario()) && s.equals(compCuenta.getServidor())) {
+							existe = true;
+						};
+						if (n.equals(compCuenta.getNombre())) {
+							existe = true; 
+						}
+					} else {
+						if (u.equals(editar.getUsuario()) && s.equals(editar.getServidor()) && n.equals(editar.getNombre())) {
+							continue;
+						} 
+						if (u.equals(compCuenta.getUsuario()) && s.equals(compCuenta.getServidor())) {
+							existe = true;
+						};
+						if (n.equals(compCuenta.getNombre())) {
+							existe = true; 
+						}
 					}
+					
 				}
 			}
 			
