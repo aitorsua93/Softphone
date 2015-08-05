@@ -59,6 +59,11 @@ public class OperacionesSip  implements SipListener {
 		            lc = op.buscarCuentas();
 		            for (int i=0;i<lc.size();i++) {
 		            	register(lc.get(i),3600);
+		            	try {
+							Thread.sleep (400);
+						} catch (Exception ex) {
+							System.out.println(ex.getMessage());
+						}
 		            }
 		         } 
 		     }; 
