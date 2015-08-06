@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><cuentas>
-<cuenta><usuario>1111</usuario><servidor>192.168.1.100</servidor><password>123</password><nombre>Administracion</nombre><estado>No registrado(Comprobar credenciales)</estado></cuenta><cuenta><usuario>2222</usuario><servidor>192.168.1.100</servidor><password>456</password><nombre>Secretaria</nombre><estado>Registrado</estado></cuenta></cuentas>
+<cuenta><usuario>1111</usuario><servidor>192.168.1.100</servidor><password>123</password><nombre>Administracion</nombre><estado>No registrado(Comprobar credenciales)</estado></cuenta><cuenta><usuario>2222</usuario><servidor>192.168.1.102</servidor><password>456</password><nombre>Secretaria</nombre><estado>Registrado</estado></cuenta></cuentas>

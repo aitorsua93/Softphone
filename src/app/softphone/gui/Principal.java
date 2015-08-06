@@ -102,6 +102,19 @@ public class Principal{
 		zonaLlamar.add(Box.createRigidArea(new Dimension (10,0)));
 		zonaLlamar.add(llamarBut);
 		zonaLlamar.add(Box.createRigidArea(new Dimension (5,0)));
+		ActionListener llamarListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String destinatario = llamarField.getText();
+				if (!destinatario.equals("")) {
+					JPanel llamada = new JPanel();
+					pestanas.addTab("Llamada", llamada);
+				}
+			}
+		};
+		llamarBut.addActionListener(llamarListener);
+		
+		
 	}
 	
 	public void crearPestanas() {

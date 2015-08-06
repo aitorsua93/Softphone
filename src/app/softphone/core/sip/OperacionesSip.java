@@ -29,11 +29,17 @@ public class OperacionesSip  implements SipListener {
 	  private final String tag = "fiewujgf489t6d23lkfd-dsfg8g125";
 	  OperacionesCuenta op = new OperacionesCuenta();
 	  Cuenta cuentaGlob;
+	  int status;
+	  
+	  static final int YES=0;
+	  static final int NO=1;
 
-	  public static void main(String[] args) throws Exception {
-	    //OperacionesSip os = new OperacionesSip();
-	    //os.register();
-	  }
+	  static final int IDLE=0;
+	  static final int WAIT_PROV=1;
+	  static final int WAIT_FINAL=2;
+	  static final int ESTABLISHED=4;
+	  static final int RINGING=5;
+	  static final int WAIT_ACK=6;
 
 	  
 	  public OperacionesSip() {
@@ -72,6 +78,7 @@ public class OperacionesSip  implements SipListener {
 		  } catch(Exception e) {
 			  System.out.println(e.getMessage());
 		  }
+		  status = IDLE;
 	  }
 	  
 	  public void register(Cuenta cuenta, int expires) {
@@ -112,6 +119,24 @@ public class OperacionesSip  implements SipListener {
 		}
 	  }
 
+	  public void call(int type, String destination, Cuenta cuenta) {
+		  try {
+			  cuentaGlob = cuenta;
+			  sipId = cuenta.getUsuario();
+			  asteriskIp = cuenta.getServidor();
+			  myPw = cuenta.getPassword(); 
+			  
+			  switch (status) {
+			  	case IDLE:
+			  		if (type == YES) {
+			  			break;
+			  		}
+			  }
+		  } catch(Exception e) {
+			  System.out.println(e.getMessage());
+		  }
+		  
+	  }
 
 	  public void subscribe(Cuenta cuenta) {
 		  try {
@@ -125,8 +150,6 @@ public class OperacionesSip  implements SipListener {
 			  myURI.setPort(myPort);
 			  Address contactAddress = address.createAddress(myURI);
 			  ContactHeader contactHeader = header.createContactHeader(contactAddress);
-	
-			  System.out.println("111111111111111111111111111111111111111111111111111111");
 			  
 			  MaxForwardsHeader maxForwards = header.createMaxForwardsHeader(5);
 	
@@ -137,11 +160,8 @@ public class OperacionesSip  implements SipListener {
 			  ToHeader toHeader = header.createToHeader(fromAddress, null);
 			  URI requestURI = address.createURI("sip:asterisk@"+asteriskIp+":"+asteriskPort+";maddr="+asteriskIp);
 		    
-			  System.out.println("2222222222222222222222222222222222222222222222222222222");
-			  
 			  Request request = message.createRequest(requestURI, Request.SUBSCRIBE, callIdHeader,
 		            cSeqHeader, fromHeader, toHeader, viaHeaders, maxForwards);
-			  System.out.println("333333333333333333333333333333333333333333333333333333333333333");
 			  request.addHeader(contactHeader);
 			  EventHeader event = header.createEventHeader("message-summary");
 			  request.addHeader(event);
@@ -149,7 +169,6 @@ public class OperacionesSip  implements SipListener {
 			  request.addHeader(eh);
 			  ClientTransaction transaction = udp.getNewClientTransaction(request);
 			  transaction.sendRequest();
-			  System.out.println("4444444444444444444444444444444444444444444444444444444444444444");
 			  System.out.println("Sent request:");
 			  System.out.println(request);
 		  } catch(Exception e) {
@@ -167,6 +186,8 @@ public class OperacionesSip  implements SipListener {
 	    public void processResponse(ResponseEvent event) {
 	      try {
 	        Response response = event.getResponse();
+	       	String[] cSeq = response.getHeader("CSeq").toString().split("\\s+");
+        	String[] expires = response.getExpires().toString().split("\\s+");
 	        System.out.println("Response received:");
 	        System.out.println(response);
 	        if (response.getStatusCode() == 401) {
@@ -180,25 +201,36 @@ public class OperacionesSip  implements SipListener {
 		        System.out.println(request);
 	        }
 	        
-	        if (response.getStatusCode() == 200) {
-	        	String[] cSeq = response.getHeader("CSeq").toString().split("\\s+");
-	        	String[] expires = response.getExpires().toString().split("\\s+");
-	        	if (cSeq[2].equals("REGISTER") && !(expires[1].equals("0")) ) {
+	        if (cSeq[2].equals("REGISTER") && !(expires[1].equals("0")) ) {
+	        	if (response.getStatusCode() == 200) {
 	        		cuentaGlob.setEstado(Estado.REGISTRADO);
 	        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
 	        	}
 	        }
-	      } catch (SipException e) { e.printStackTrace(); }
+	      } catch (SipException e) { 
+	    	  e.printStackTrace(); 
+	      }
 	    }
 
 	    @Override
-	    public void processTimeout(TimeoutEvent timeoutEvent) {}
+	    public void processTimeout(TimeoutEvent timeoutEvent) {
+	    	System.out.println("process Timeout");
+	    }
+	   
 	    @Override
-	    public void processIOException(IOExceptionEvent exceptionEvent) {}
+	    public void processIOException(IOExceptionEvent exceptionEvent) {
+	    	System.out.println("process IOException");
+	    }
+	    
 	    @Override
-	    public void processTransactionTerminated(TransactionTerminatedEvent transactionTerminatedEvent) {}
+	    public void processTransactionTerminated(TransactionTerminatedEvent transactionTerminatedEvent) {
+	    	System.out.println("process Transaction Terminated");
+	    }
+	    
 	    @Override
-	    public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {}
+	    public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
+	    	System.out.println("process Dialog Terminated");
+	    }
 	 
 
 	  private class AccountManagerImpl implements AccountManager {
@@ -206,11 +238,19 @@ public class OperacionesSip  implements SipListener {
 	    public UserCredentials getCredentials(ClientTransaction clientTransaction, String s) {
 	      return new UserCredentials() {
 	        @Override
-	        public String getUserName() { return sipId; }
+	        public String getUserName() { 
+	        	return sipId; 
+	        }
+	        
 	        @Override
-	        public String getPassword() { return myPw; }
+	        public String getPassword() { 
+	        	return myPw; 
+	        }
+	        
 	        @Override
-	        public String getSipDomain() { return asteriskIp; }
+	        public String getSipDomain() { 
+	        	return asteriskIp; 
+	        }
 	      };
 	    }
 	  }
