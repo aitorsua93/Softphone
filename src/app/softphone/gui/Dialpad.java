@@ -1,9 +1,12 @@
 package app.softphone.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -15,21 +18,29 @@ public class Dialpad extends JPanel implements ActionListener {
 	String [] butName = {"1","2","3","4","5","6","7","8","9","*","0","#"};
 	JButton[] buttons  = new JButton[12];
 	JTextField llamarField;
-	
+	JPanel botones;
 	
 	public Dialpad(JTextField llamarText) {
 		llamarField = llamarText;
-		setLayout(new GridLayout(4,3,20,20));
 		crearBotones();
+		add(botones, BorderLayout.CENTER);
+		add(Box.createRigidArea(new Dimension (30,20)), BorderLayout.NORTH);
+		add(Box.createRigidArea(new Dimension (30,20)), BorderLayout.SOUTH);
+		add(Box.createRigidArea(new Dimension (30,20)), BorderLayout.WEST);
+		add(Box.createRigidArea(new Dimension (30,20)), BorderLayout.EAST);
 	}
 	
 	public void crearBotones() {
+		botones = new JPanel();
+		botones.setLayout(new GridLayout(4,3,20,20));
 		for (int i=0;i<butName.length;i++) {
 			buttons[i] = new JButton(butName[i]);
 			buttons[i].addActionListener(this);
-			add(buttons[i]);
+			botones.add(buttons[i]);
 		}
 	}
+	
+	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
