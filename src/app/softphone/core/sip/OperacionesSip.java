@@ -212,22 +212,22 @@ public class OperacionesSip  implements SipListener {
 				        System.out.println(request);
 			        }
 			        
-			  switch (status) {
-			  	case REGISTER: 
-			        String[] expires = response.getExpires().toString().split("\\s+");
-			        if (!(expires[1].equals("0")) ) {
-			        	if (response.getStatusCode() == 200) {
-			        		cuentaGlob.setEstado(Estado.REGISTRADO);
-			        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
-			        	}
-			        }
-			        if (response.getStatusCode() == 403) {
-			        	cuentaGlob.setEstado(Estado.NO_REGISTRADO);
-		        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
-			        }
-			        
-			        status = IDLE;
-			        break;
+			        switch (status) {
+			        	case REGISTER: 
+					        String[] expires = response.getExpires().toString().split("\\s+");
+					        if (!(expires[1].equals("0")) ) {
+					        	if (response.getStatusCode() == 200) {
+					        		cuentaGlob.setEstado(Estado.REGISTRADO);
+					        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
+					        	}
+					        }
+					        if (response.getStatusCode() == 403) {
+					        	cuentaGlob.setEstado(Estado.NO_REGISTRADO);
+				        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
+					        }
+					        
+					        status = IDLE;
+					        break;
 			  }
 			      } catch (SipException e) { 
 			    	  e.printStackTrace(); 
