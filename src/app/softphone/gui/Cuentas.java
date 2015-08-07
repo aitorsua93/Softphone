@@ -9,8 +9,10 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,14 +35,14 @@ public class Cuentas extends JPanel {
 	DefaultListModel<String> ln;
 	JButton crCuenta, edCuenta, elCuenta; 
 	
-	public Cuentas(OperacionesSip opSip) {
-		crearPanelLista(opSip);
+	public Cuentas(OperacionesSip opSip, JComboBox<String> cuentaBox) {
+		crearPanelLista(opSip,cuentaBox);
 		//crearPanelBotones();
 		add(panelLista, BorderLayout.WEST);
 		add(panelBotones, BorderLayout.CENTER);
 	}
 	
-	public void crearPanelLista(OperacionesSip opSip) {
+	public void crearPanelLista(OperacionesSip opSip, JComboBox<String> cuentaBox) {
 		lc = new ArrayList<Cuenta>();
 		ln = new DefaultListModel<String>();
  		panelLista = new JPanel();
@@ -55,11 +57,11 @@ public class Cuentas extends JPanel {
 		JScrollPane listScroller = new JScrollPane(lista);
 		listScroller.setPreferredSize(new Dimension(250, 320));
 		panelLista.add(listScroller, BorderLayout.CENTER);
-		crearPanelBotones(lista,ln,opSip);
+		crearPanelBotones(lista,ln,opSip,cuentaBox);
 	}
 
 	
-	public void crearPanelBotones(JList<String> list, DefaultListModel<String> ln, OperacionesSip opSip) {
+	public void crearPanelBotones(JList<String> list, DefaultListModel<String> ln, OperacionesSip opSip, JComboBox<String> cuentaBox) {
 		panelBotones = new JPanel();
 		panelBotones.setLayout(new BoxLayout(panelBotones,BoxLayout.Y_AXIS));
 		crCuenta = new JButton();
@@ -82,7 +84,7 @@ public class Cuentas extends JPanel {
 		ActionListener crCuentaListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CrearCuenta crear = new CrearCuenta(ln,opSip);
+				CrearCuenta crear = new CrearCuenta(ln,opSip,cuentaBox);
 				crear.setLocationRelativeTo(panelLista);
 				crear.setVisible(true);
 			}
@@ -95,7 +97,7 @@ public class Cuentas extends JPanel {
 				int index = list.getSelectedIndex();
 				String[] nombre = c.split("\\s+");
 				Cuenta cuentaEd = op.buscarCuenta(nombre[0]);
-				EditarCuenta editar = new EditarCuenta(cuentaEd,ln,index,opSip);
+				EditarCuenta editar = new EditarCuenta(cuentaEd,ln,index,opSip,cuentaBox);
 				editar.setLocationRelativeTo(panelLista);
 				editar.setVisible(true);
 			}
@@ -114,6 +116,16 @@ public class Cuentas extends JPanel {
 				if (cuenta.getEstado().getDescr().equals(Estado.REGISTRADO.getDescr())) {
 					opSip.register(cuenta,0);
 					//opSip.subscribe(cuenta);
+					//Actualizar ComboBox
+					List<Cuenta> lc = new ArrayList<Cuenta>();
+					lc = op.buscarCuentas();
+					DefaultComboBoxModel<String> cuentas = new DefaultComboBoxModel<String>();
+					for (int i=0;i<lc.size();i++) {
+						if (lc.get(i).getEstado().equals(Estado.REGISTRADO)) {
+							cuentas.addElement(lc.get(i).getNombre() + " <" + lc.get(i).getUsuario() + "@" + lc.get(i).getServidor() + ">");
+						}
+					}
+					cuentaBox.setModel(cuentas);
 				}
 			}
 		};

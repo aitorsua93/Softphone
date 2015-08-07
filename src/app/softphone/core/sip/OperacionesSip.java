@@ -12,6 +12,8 @@ import app.softphone.core.cuentas.Cuenta;
 import app.softphone.core.cuentas.EstadoCuenta.Estado;
 import app.softphone.core.cuentas.OperacionesCuenta;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.*;
 
 public class OperacionesSip  implements SipListener {
@@ -25,8 +27,9 @@ public class OperacionesSip  implements SipListener {
 	  private final int myPort = 5060;
 	  String myPw;
 	  String asteriskIp;
+	  long seq = 1;
 	  private final int asteriskPort = 5060;
-	  private final String tag = "fiewujgf489t6d23lkfd-dsfg8g125";
+	  //private final String tag = "fiewujgf489t6d23lkfd-dsfg8g125";
 	  OperacionesCuenta op = new OperacionesCuenta();
 	  Cuenta cuentaGlob;
 	  int status;
@@ -34,6 +37,7 @@ public class OperacionesSip  implements SipListener {
 	  static final int YES=0;
 	  static final int NO=1;
 
+	  static final int REGISTER=0;
 	  static final int IDLE=0;
 	  static final int WAIT_PROV=1;
 	  static final int WAIT_FINAL=2;
@@ -41,6 +45,13 @@ public class OperacionesSip  implements SipListener {
 	  static final int RINGING=5;
 	  static final int WAIT_ACK=6;
 
+	  
+	  
+	  private SecureRandom random = new SecureRandom();
+
+	  public String nextTag() {
+	    return new BigInteger(32, random).toString(64);
+	  }
 	  
 	  public OperacionesSip() {
 		  try {
@@ -86,7 +97,10 @@ public class OperacionesSip  implements SipListener {
 			  cuentaGlob = cuenta;
 			  sipId = cuenta.getUsuario();
 			  asteriskIp = cuenta.getServidor();
-			  myPw = cuenta.getPassword(); 
+			  myPw = cuenta.getPassword();
+			  status = REGISTER;
+			  String tag = nextTag();
+
 			  SipURI myRealmURI = address.createSipURI(sipId, asteriskIp);
 			  Address fromAddress = address.createAddress(myRealmURI);
 			  FromHeader fromHeader = header.createFromHeader(fromAddress, tag);
@@ -99,8 +113,7 @@ public class OperacionesSip  implements SipListener {
 	
 			  List<ViaHeader> viaHeaders = new ArrayList<>();
 			  CallIdHeader callIdHeader = udp.getNewCallId();
-			  long seq = 1;
-			  CSeqHeader cSeqHeader = header.createCSeqHeader(seq++, Request.REGISTER);
+			  CSeqHeader cSeqHeader = header.createCSeqHeader(seq+3, Request.REGISTER);
 			  ToHeader toHeader = header.createToHeader(fromAddress, null);
 			  URI requestURI = address.createURI("sip:"+asteriskIp+":"+asteriskPort+";maddr="+asteriskIp);
 		    
@@ -138,7 +151,7 @@ public class OperacionesSip  implements SipListener {
 		  
 	  }
 
-	  public void subscribe(Cuenta cuenta) {
+	  /*public void subscribe(Cuenta cuenta) {
 		  try {
 			  sipId = cuenta.getUsuario();
 			  asteriskIp = cuenta.getServidor();
@@ -174,7 +187,7 @@ public class OperacionesSip  implements SipListener {
 		  } catch(Exception e) {
 			 System.out.println(e.getMessage());
 		  }
-	  }
+	  }*/
 	  
 	    @Override
 	    public void processRequest(RequestEvent requestEvent) {
@@ -184,52 +197,65 @@ public class OperacionesSip  implements SipListener {
 	 
 	    @Override
 	    public void processResponse(ResponseEvent event) {
-	      try {
-	        Response response = event.getResponse();
-	       	String[] cSeq = response.getHeader("CSeq").toString().split("\\s+");
-        	String[] expires = response.getExpires().toString().split("\\s+");
-	        System.out.println("Response received:");
-	        System.out.println(response);
-	        if (response.getStatusCode() == 401) {
-		        ClientTransaction tid = event.getClientTransaction();
-		        AccountManagerImpl manager = new AccountManagerImpl();
-		        AuthenticationHelper helper = sipStack.getAuthenticationHelper(manager, header);
-		        ClientTransaction transaction = helper.handleChallenge(response, tid, udp, 5);
-		        transaction.sendRequest();
-		        Request request = transaction.getRequest();
-		        System.out.println("Sent request with authentication info:");
-		        System.out.println(request);
-	        }
-	        
-	        if (cSeq[2].equals("REGISTER") && !(expires[1].equals("0")) ) {
-	        	if (response.getStatusCode() == 200) {
-	        		cuentaGlob.setEstado(Estado.REGISTRADO);
-	        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
-	        	}
-	        }
-	      } catch (SipException e) { 
-	    	  e.printStackTrace(); 
-	      }
+		      try {
+			        Response response = event.getResponse();
+			        System.out.println("Response received:");
+			        System.out.println(response);
+			        if (response.getStatusCode() == 401) {
+				        ClientTransaction tid = event.getClientTransaction();
+				        AccountManagerImpl manager = new AccountManagerImpl();
+				        AuthenticationHelper helper = sipStack.getAuthenticationHelper(manager, header);
+				        ClientTransaction transaction = helper.handleChallenge(response, tid, udp, 5);
+				        transaction.sendRequest();
+				        Request request = transaction.getRequest();
+				        System.out.println("Sent request with authentication info:");
+				        System.out.println(request);
+			        }
+			        
+			  switch (status) {
+			  	case REGISTER: 
+			        String[] expires = response.getExpires().toString().split("\\s+");
+			        if (!(expires[1].equals("0")) ) {
+			        	if (response.getStatusCode() == 200) {
+			        		cuentaGlob.setEstado(Estado.REGISTRADO);
+			        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
+			        	}
+			        }
+			        if (response.getStatusCode() == 403) {
+			        	cuentaGlob.setEstado(Estado.NO_REGISTRADO);
+		        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
+			        }
+			        
+			        status = IDLE;
+			        break;
+			  }
+			      } catch (SipException e) { 
+			    	  e.printStackTrace(); 
+			      }
 	    }
 
 	    @Override
 	    public void processTimeout(TimeoutEvent timeoutEvent) {
-	    	System.out.println("process Timeout");
+	    	switch (status) {
+	    		case REGISTER:
+	        		status = IDLE;
+	        		break;
+	        }
 	    }
 	   
 	    @Override
 	    public void processIOException(IOExceptionEvent exceptionEvent) {
-	    	System.out.println("process IOException");
+	    	//System.out.println("process IOException");
 	    }
 	    
 	    @Override
 	    public void processTransactionTerminated(TransactionTerminatedEvent transactionTerminatedEvent) {
-	    	System.out.println("process Transaction Terminated");
+	    	//System.out.println("process Transaction Terminated");
 	    }
 	    
 	    @Override
 	    public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
-	    	System.out.println("process Dialog Terminated");
+	    	//System.out.println("process Dialog Terminated");
 	    }
 	 
 

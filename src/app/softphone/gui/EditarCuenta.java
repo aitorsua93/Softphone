@@ -6,10 +6,14 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -34,9 +38,9 @@ public class EditarCuenta extends JDialog{
 	Cuenta nuevaCuenta;
 	OperacionesCuenta op = new OperacionesCuenta();
 
-	public EditarCuenta(Cuenta edCuenta,DefaultListModel<String> ln, int index, OperacionesSip opSip) {
+	public EditarCuenta(Cuenta edCuenta,DefaultListModel<String> ln, int index, OperacionesSip opSip, JComboBox<String> cuentaBox) {
 		crearPanelDatos(edCuenta);
-		crearPanelBotones(edCuenta,ln,index,opSip);
+		crearPanelBotones(edCuenta,ln,index,opSip,cuentaBox);
 		crearVentana();
 	}
 	
@@ -75,7 +79,7 @@ public class EditarCuenta extends JDialog{
 	}
 	
 
-	public void crearPanelBotones(Cuenta edCuenta,DefaultListModel<String> ln, int index, OperacionesSip opSip) {
+	public void crearPanelBotones(Cuenta edCuenta,DefaultListModel<String> ln, int index, OperacionesSip opSip, JComboBox<String> cuentaBox) {
 		panelBotones = new JPanel(new FlowLayout());
 		
 		aceptarCue = new JButton();
@@ -112,7 +116,16 @@ public class EditarCuenta extends JDialog{
 				nuevaCuenta = op.buscarCuenta(nombre);
 				ln.remove(index);
 				ln.add(index, nombre + " | <" + usuario + "@" + servidor + "> | " + nuevaCuenta.getEstado().getDescr());
-				
+				//Actualizar ComboBox
+				List<Cuenta> lc = new ArrayList<Cuenta>();
+				lc = op.buscarCuentas();
+				DefaultComboBoxModel<String> cuentas = new DefaultComboBoxModel<String>();
+				for (int i=0;i<lc.size();i++) {
+					if (lc.get(i).getEstado().equals(Estado.REGISTRADO)) {
+						cuentas.addElement(lc.get(i).getNombre() + " <" + lc.get(i).getUsuario() + "@" + lc.get(i).getServidor() + ">");
+					}
+				}
+				cuentaBox.setModel(cuentas);
 			}
 		};
 		aceptarCue.addActionListener(aceptarCueListener);

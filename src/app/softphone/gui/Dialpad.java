@@ -24,15 +24,16 @@ public class Dialpad extends JPanel implements ActionListener {
 		llamarField = llamarText;
 		crearBotones();
 		add(botones, BorderLayout.CENTER);
-		add(Box.createRigidArea(new Dimension (30,20)), BorderLayout.NORTH);
-		add(Box.createRigidArea(new Dimension (30,20)), BorderLayout.SOUTH);
-		add(Box.createRigidArea(new Dimension (30,20)), BorderLayout.WEST);
-		add(Box.createRigidArea(new Dimension (30,20)), BorderLayout.EAST);
+		//add(Box.createRigidArea(new Dimension (0,20)), BorderLayout.NORTH);
+		//add(Box.createRigidArea(new Dimension (20,20)), BorderLayout.SOUTH);
+		//add(Box.createRigidArea(new Dimension (10,10)), BorderLayout.WEST);
+		//add(Box.createRigidArea(new Dimension (10,10)), BorderLayout.EAST);
 	}
 	
 	public void crearBotones() {
 		botones = new JPanel();
-		botones.setLayout(new GridLayout(4,3,20,20));
+		botones.setPreferredSize(new Dimension(200,200));
+		botones.setLayout(new GridLayout(4,3,10,10));
 		for (int i=0;i<butName.length;i++) {
 			buttons[i] = new JButton(butName[i]);
 			buttons[i].addActionListener(this);

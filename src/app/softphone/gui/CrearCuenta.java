@@ -6,10 +6,14 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -36,15 +40,15 @@ public class CrearCuenta extends JDialog {
 	DefaultListModel<String> ln = new DefaultListModel<String>();;
 	OperacionesCuenta op = new OperacionesCuenta();
 
-	public CrearCuenta(DefaultListModel<String> ln, OperacionesSip opSip) {
+	public CrearCuenta(DefaultListModel<String> ln, OperacionesSip opSip, JComboBox<String> cuentaBox) {
 		crearPanelDatos();
-		crearPanelBotones(ln,opSip);
+		crearPanelBotones(ln,opSip,cuentaBox);
 		crearVentana();
 	}
 
-	public CrearCuenta(OperacionesSip opSip) {
+	public CrearCuenta(OperacionesSip opSip, JComboBox<String> cuentaBox) {
 		crearPanelDatos();
-		crearPanelBotones(ln,opSip);
+		crearPanelBotones(ln,opSip, cuentaBox);
 		crearVentana();
 	}
 	
@@ -77,7 +81,7 @@ public class CrearCuenta extends JDialog {
 	}
 	
 
-	public void crearPanelBotones(DefaultListModel<String> ln, OperacionesSip opSip) {
+	public void crearPanelBotones(DefaultListModel<String> ln, OperacionesSip opSip, JComboBox<String> cuentaBox) {
 		panelBotones = new JPanel(new FlowLayout());
 		
 		aceptarCue = new JButton();
@@ -107,6 +111,16 @@ public class CrearCuenta extends JDialog {
 				p.setVisible(true);
 				nuevaCuenta = op.buscarCuenta(nuevaCuenta.getNombre());
 				ln.addElement(nombre + " | <" + usuario + "@" + servidor + "> | " + nuevaCuenta.getEstado().getDescr());
+				//Actualizar ComboBox
+				List<Cuenta> lc = new ArrayList<Cuenta>();
+				lc = op.buscarCuentas();
+				DefaultComboBoxModel<String> cuentas = new DefaultComboBoxModel<String>();
+				for (int i=0;i<lc.size();i++) {
+					if (lc.get(i).getEstado().equals(Estado.REGISTRADO)) {
+						cuentas.addElement(lc.get(i).getNombre() + " <" + lc.get(i).getUsuario() + "@" + lc.get(i).getServidor() + ">");
+					}
+				}
+				cuentaBox.setModel(cuentas);
 				
 			}
 		};

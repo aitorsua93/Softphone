@@ -4,9 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 
+import app.softphone.core.cuentas.Cuenta;
+import app.softphone.core.cuentas.EstadoCuenta.Estado;
+import app.softphone.core.cuentas.OperacionesCuenta;
 import app.softphone.core.sip.OperacionesSip;
 
 
@@ -18,6 +23,9 @@ public class Principal{
 	JTextField llamarField;
 	JButton llamarBut;
 	OperacionesSip opSip;
+	JComboBox<String> cuentaBox;
+	OperacionesCuenta opC = new OperacionesCuenta();
+	JPanel elegirC; 
 	
 	public static void main (String[] args) {
 		new Principal();
@@ -29,6 +37,7 @@ public class Principal{
 		crearMenu(opSip);
 		crearZonaLlamar(opSip);
 		crearPestanas();
+		crearElegirCuenta();
 		crearVentana();
 	}
 	
@@ -46,7 +55,7 @@ public class Principal{
 		ActionListener crearCuentaListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CrearCuenta crearCuenta = new CrearCuenta(opSip);
+				CrearCuenta crearCuenta = new CrearCuenta(opSip,cuentaBox);
 				crearCuenta.setLocationRelativeTo(ventana);
 				crearCuenta.setVisible(true);
 			}
@@ -59,7 +68,7 @@ public class Principal{
 		ActionListener preferenciasListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Preferencias preferencias = new Preferencias(opSip);
+				Preferencias preferencias = new Preferencias(opSip,cuentaBox);
 				preferencias.setLocationRelativeTo(ventana);
 				preferencias.setVisible(true);
 			}
@@ -108,13 +117,13 @@ public class Principal{
 				String destinatario = llamarField.getText();
 				if (!destinatario.equals("")) {
 					JPanel llamada = new JPanel();
-					pestanas.addTab("Llamada", llamada);
+					pestanas.insertTab("Llamada", null, llamada, null, 0);
+					pestanas.setSelectedIndex(0);
+					llamarField.setText("");
 				}
 			}
 		};
 		llamarBut.addActionListener(llamarListener);
-		
-		
 	}
 	
 	public void crearPestanas() {
@@ -127,16 +136,35 @@ public class Principal{
 		pestanas.addTab("Dialpad", dialpad);
 	}
 	
+	public void crearElegirCuenta() {
+		elegirC = new JPanel();
+		List<Cuenta> lc = new ArrayList<Cuenta>();
+		lc = opC.buscarCuentas();
+		DefaultComboBoxModel<String> cuentas = new DefaultComboBoxModel<String>();
+		for (int i=0;i<lc.size();i++) {
+			if (lc.get(i).getEstado().equals(Estado.REGISTRADO)) {
+				cuentas.addElement(lc.get(i).getNombre() + " <" + lc.get(i).getUsuario() + "@" + lc.get(i).getServidor() + ">");
+			}
+		}
+		cuentaBox = new JComboBox<String>(cuentas);
+		elegirC.add(Box.createRigidArea(new Dimension (0,10)), BorderLayout.NORTH);
+		elegirC.add(cuentaBox, BorderLayout.CENTER);
+		elegirC.add(Box.createRigidArea(new Dimension (0,10)), BorderLayout.SOUTH);
+		elegirC.add(Box.createRigidArea(new Dimension (0,5)), BorderLayout.WEST);
+		elegirC.add(Box.createRigidArea(new Dimension (0,5)), BorderLayout.EAST);
+	}
+	
 	public void crearVentana() {
 		ventana = new JFrame();
 		ventana.setTitle("Softphone");
-		ventana.setSize(260,380);
+		ventana.setSize(350,450);
 		ventana.setJMenuBar(menuPrin);
 		ventana.add(zonaLlamar, BorderLayout.NORTH); // Colocar la zona de llamar en la zona de arriba de la ventana
-		ventana.add(pestanas, BorderLayout.CENTER); // Colocar las pestañas en centro de la ventana
+		ventana.add(pestanas, BorderLayout.CENTER); // Colocar las pestaï¿½as en centro de la ventana
+		ventana.add(elegirC, BorderLayout.SOUTH);
 		ventana.setLocationRelativeTo(null); // Poner pantalla en el centro de la pantalla
 		ventana.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // Funcion para terminar la aplicacion al cerrar la ventana principal
-		ventana.setResizable(true); // Evitar aumentar el tamaño de la ventana
+		ventana.setResizable(true); // Evitar aumentar el tamaï¿½o de la ventana
 		ventana.setVisible(true); 
 	}
 

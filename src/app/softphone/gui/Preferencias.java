@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -21,15 +22,15 @@ public class Preferencias extends JDialog {
 	JButton aceptarPre, cancelarPre;
 	
 
-	public Preferencias(OperacionesSip opSip) {
-		crearPestanas(opSip);
+	public Preferencias(OperacionesSip opSip, JComboBox<String> cuentaBox) {
+		crearPestanas(opSip,cuentaBox);
 		crearPanelBotones();
 		crearVentana();
 	}
 
-	public void crearPestanas(OperacionesSip opSip) {
+	public void crearPestanas(OperacionesSip opSip, JComboBox<String> cuentaBox) {
 		pestanas = new JTabbedPane();
-		cuenta = new Cuentas(opSip);
+		cuenta = new Cuentas(opSip,cuentaBox);
 		desvio = new Desvio();
 		captura = new Captura();
 		pestanas.addTab("Cuentas", cuenta);
