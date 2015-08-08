@@ -27,7 +27,7 @@ public class OperacionesCuenta {
 
 	
 	public static void main(String[] args) {
-		Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion",Estado.NO_REGISTRADO);
+		/*Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion",Estado.NO_REGISTRADO);
 		Cuenta cuenta2 = new Cuenta("2222","192.168.1.100","456","Secretaria",Estado.REGISTRADO);
 		Cuenta cuenta3 = new Cuenta("2222","192.168.1.102","456","Secretaria",Estado.REGISTRADO);
 		OperacionesCuenta op = new OperacionesCuenta();
@@ -43,7 +43,7 @@ public class OperacionesCuenta {
 		//b = op.buscarCuenta("Secretaria");
 		//System.out.println(b.getEstado().getDescr());
 		System.out.println(c.get(0).getEstado().getDescr());
-		System.out.println(c.get(1).getServidor());
+		System.out.println(c.get(1).getServidor());*/
 	}
 	
 	

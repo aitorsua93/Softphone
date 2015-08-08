@@ -9,9 +9,6 @@ import javax.sip.header.*;
 import javax.sip.message.*;
 
 import app.softphone.core.cuentas.Cuenta;
-import app.softphone.core.cuentas.EstadoCuenta.Estado;
-import app.softphone.core.cuentas.OperacionesCuenta;
-
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
@@ -22,17 +19,17 @@ public class OperacionesSip  implements SipListener {
 	  SipProvider udp;
 	  AddressFactory address;
 	  MessageFactory message;
+	  ListeningPoint udpPoint;
 	  String sipId;
-	  private final String myIp = "192.168.1.101";
-	  private final int myPort = 5060;
+	  String myIp;
+	  int myPort = 5060;
 	  String myPw;
 	  String asteriskIp;
 	  long seq = 1;
-	  private final int asteriskPort = 5060;
-	  //private final String tag = "fiewujgf489t6d23lkfd-dsfg8g125";
-	  OperacionesCuenta op = new OperacionesCuenta();
+	  int asteriskPort = 5060;
 	  Cuenta cuentaGlob;
 	  int status;
+	  boolean registro;
 	  
 	  static final int YES=0;
 	  static final int NO=1;
@@ -53,51 +50,47 @@ public class OperacionesSip  implements SipListener {
 	    return new BigInteger(32, random).toString(64);
 	  }
 	  
-	  public OperacionesSip() {
+	  public OperacionesSip(String myIp, Cuenta c) {
+		  this.myIp = myIp;
+		  this.sipId = c.getUsuario();
+		  this.asteriskIp = c.getServidor();
+		  this.myPw = c.getPassword();
 		  try {
-		  SipFactory sipFactory = SipFactory.getInstance();
-		  sipFactory.setPathName("gov.nist");
-		  Properties properties = new Properties();
-
-		  properties.setProperty("javax.sip.STACK_NAME", "softphone");
-		    //properties.setProperty("javax.sip.OUTBOUND_PROXY", asteriskIp+":"+asteriskPort+"/udp");
-		  this.sipStack = (SipStackExt) sipFactory.createSipStack(properties);	
-		  header = sipFactory.createHeaderFactory();
-		  address = sipFactory.createAddressFactory();
-		  message = sipFactory.createMessageFactory();
-		  ListeningPoint udpPoint = sipStack.createListeningPoint(myIp, myPort, "udp");
-		  udp = sipStack.createSipProvider(udpPoint);
-		  udp.addSipListener(this);
-		  TimerTask registerTask = new TimerTask() 
-		     { 
-		         public void run()  
-		         { 
-		            List<Cuenta> lc = new ArrayList<Cuenta>();
-		            lc = op.buscarCuentas();
-		            for (int i=0;i<lc.size();i++) {
-		            	register(lc.get(i),3600);
-		            	try {
+			  SipFactory sipFactory = SipFactory.getInstance();
+			  sipFactory.setPathName("gov.nist");
+			  Properties properties = new Properties();
+	
+			  properties.setProperty("javax.sip.STACK_NAME", "softphone");
+			    //properties.setProperty("javax.sip.OUTBOUND_PROXY", asteriskIp+":"+asteriskPort+"/udp");
+			  this.sipStack = (SipStackExt) sipFactory.createSipStack(properties);	
+			  header = sipFactory.createHeaderFactory();
+			  address = sipFactory.createAddressFactory();
+			  message = sipFactory.createMessageFactory();
+			  udpPoint = sipStack.createListeningPoint(myIp, myPort, "udp");
+			  udp = sipStack.createSipProvider(udpPoint);
+			  udp.addSipListener(this);
+			  TimerTask registerTask = new TimerTask() 
+			     { 
+			         public void run()  
+			         { 
+			            register(3600);
+			            try {
 							Thread.sleep (400);
 						} catch (Exception ex) {
 							System.out.println(ex.getMessage());
-						}
-		            }
-		         } 
-		     }; 
-		  Timer timer = new Timer();
-		  timer.scheduleAtFixedRate(registerTask, 0, 500000);
+						} 
+			         } 
+			     }; 
+			  Timer timer = new Timer();
+			  timer.scheduleAtFixedRate(registerTask, 0, 500000);
 		  } catch(Exception e) {
 			  System.out.println(e.getMessage());
 		  }
 		  status = IDLE;
 	  }
 	  
-	  public void register(Cuenta cuenta, int expires) {
+	  public void register(int expires) {
 		  try {
-			  cuentaGlob = cuenta;
-			  sipId = cuenta.getUsuario();
-			  asteriskIp = cuenta.getServidor();
-			  myPw = cuenta.getPassword();
 			  status = REGISTER;
 			  String tag = nextTag();
 
@@ -132,13 +125,8 @@ public class OperacionesSip  implements SipListener {
 		}
 	  }
 
-	  public void call(int type, String destination, Cuenta cuenta) {
+	  public void call(int type, String destination) {
 		  try {
-			  cuentaGlob = cuenta;
-			  sipId = cuenta.getUsuario();
-			  asteriskIp = cuenta.getServidor();
-			  myPw = cuenta.getPassword(); 
-			  
 			  switch (status) {
 			  	case IDLE:
 			  		if (type == YES) {
@@ -189,19 +177,34 @@ public class OperacionesSip  implements SipListener {
 		  }
 	  }*/
 	  
-	    @Override
-	    public void processRequest(RequestEvent requestEvent) {
+	  public boolean getRegistro() {
+		  return this.registro;
+	  }
+	 
+	  public void removeListener() {
+		  udp.removeSipListener(this);
+		  try {
+			  sipStack.deleteSipProvider(udp);
+			  sipStack.deleteListeningPoint(udpPoint);
+		  } catch(Exception e) {
+			  System.out.println(e.getMessage());
+		  }
+	  }
+	  
+	  @Override
+	  public void processRequest(RequestEvent requestEvent) {
 	    	
-	    }
+	  }
 	    
 	 
-	    @Override
-	    public void processResponse(ResponseEvent event) {
-		      try {
-			        Response response = event.getResponse();
-			        System.out.println("Response received:");
-			        System.out.println(response);
-			        if (response.getStatusCode() == 401) {
+	    
+	  @Override
+	  public void processResponse(ResponseEvent event) {
+		  try {
+			  Response response = event.getResponse();
+			  System.out.println("Response received:");
+			  System.out.println(response);
+			  	if (response.getStatusCode() == 401) {
 				        ClientTransaction tid = event.getClientTransaction();
 				        AccountManagerImpl manager = new AccountManagerImpl();
 				        AuthenticationHelper helper = sipStack.getAuthenticationHelper(manager, header);
@@ -217,13 +220,11 @@ public class OperacionesSip  implements SipListener {
 					        String[] expires = response.getExpires().toString().split("\\s+");
 					        if (!(expires[1].equals("0")) ) {
 					        	if (response.getStatusCode() == 200) {
-					        		cuentaGlob.setEstado(Estado.REGISTRADO);
-					        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
+					        		registro = true;
 					        	}
 					        }
 					        if (response.getStatusCode() == 403) {
-					        	cuentaGlob.setEstado(Estado.NO_REGISTRADO);
-				        		op.actualizar(cuentaGlob, cuentaGlob.getNombre());
+					        	registro = false;
 					        }
 					        
 					        status = IDLE;
@@ -238,6 +239,7 @@ public class OperacionesSip  implements SipListener {
 	    public void processTimeout(TimeoutEvent timeoutEvent) {
 	    	switch (status) {
 	    		case REGISTER:
+	    			registro = false;
 	        		status = IDLE;
 	        		break;
 	        }

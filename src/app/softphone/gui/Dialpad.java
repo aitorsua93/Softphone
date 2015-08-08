@@ -6,7 +6,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -24,10 +23,6 @@ public class Dialpad extends JPanel implements ActionListener {
 		llamarField = llamarText;
 		crearBotones();
 		add(botones, BorderLayout.CENTER);
-		//add(Box.createRigidArea(new Dimension (0,20)), BorderLayout.NORTH);
-		//add(Box.createRigidArea(new Dimension (20,20)), BorderLayout.SOUTH);
-		//add(Box.createRigidArea(new Dimension (10,10)), BorderLayout.WEST);
-		//add(Box.createRigidArea(new Dimension (10,10)), BorderLayout.EAST);
 	}
 	
 	public void crearBotones() {

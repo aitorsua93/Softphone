@@ -14,12 +14,11 @@ public class Cuenta {
 		
 	}
 	
-	public Cuenta(String usuario, String servidor, String password, String nombre, Estado estado) {
+	public Cuenta(String usuario, String servidor, String password, String nombre) {
 		this.usuario = usuario;
 		this.servidor = servidor;
 		this.password = password;
 		this.nombre = nombre;
-		this.estado = estado;
 	}
 	
 	public String getUsuario() {

@@ -6,12 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
+import app.softphone.core.cuentas.Cuenta;
 import app.softphone.core.sip.OperacionesSip;
 
 @SuppressWarnings("serial")
@@ -22,15 +23,15 @@ public class Preferencias extends JDialog {
 	JButton aceptarPre, cancelarPre;
 	
 
-	public Preferencias(OperacionesSip opSip, JComboBox<String> cuentaBox) {
-		crearPestanas(opSip,cuentaBox);
+	public Preferencias(OperacionesSip opSip, Cuenta c, JMenuItem in) {
+		crearPestanas(opSip,c,in);
 		crearPanelBotones();
 		crearVentana();
 	}
 
-	public void crearPestanas(OperacionesSip opSip, JComboBox<String> cuentaBox) {
+	public void crearPestanas(OperacionesSip opSip, Cuenta c, JMenuItem in) {
 		pestanas = new JTabbedPane();
-		cuenta = new Cuentas(opSip,cuentaBox);
+		cuenta = new Cuentas(opSip,c,in);
 		desvio = new Desvio();
 		captura = new Captura();
 		pestanas.addTab("Cuentas", cuenta);
