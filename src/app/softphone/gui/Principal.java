@@ -23,6 +23,7 @@ public class Principal {
 	Cuenta cuenta;
 	IniciarSesion is;
 	JMenuItem iniciarSesion;
+	Log l = new Log();
 	
 	
 	public static void main(String[] args) {
@@ -41,8 +42,10 @@ public class Principal {
 	public void crearMenu() {
 		menuPrin = new JMenuBar();
 		JMenu opciones = new JMenu("Opciones");
+		JMenu log = new JMenu("Log");
 		JMenu ayuda = new JMenu("Ayuda");
 		menuPrin.add(opciones);
+		menuPrin.add(log);
 		menuPrin.add(ayuda);
 		
 		
@@ -71,7 +74,6 @@ public class Principal {
 				} else {
 					opSip = is.getOpSip();
 					cuenta = is.getCuenta();
-					System.out.println(cuenta.getNombre());
 				}
 				Preferencias preferencias = new Preferencias(opSip,cuenta,iniciarSesion);
 				preferencias.setLocationRelativeTo(ventana);
@@ -79,6 +81,18 @@ public class Principal {
 			}
 		};
 		preferencias.addActionListener(preferenciasListener);
+		
+		//Item Log
+		JMenuItem logV = new JMenuItem("Ver log"); 
+		log.add(logV);
+		ActionListener logVListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				l.setLocationRelativeTo(ventana);
+				l.setVisible(true);
+			}
+		};
+		logV.addActionListener(logVListener);
 		
 		//Item Acerca De con Listener para mostrar la ventana AcercaDe
 		JMenuItem acercaDe = new JMenuItem("Acerca De"); 

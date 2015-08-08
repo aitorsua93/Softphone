@@ -8,7 +8,10 @@ import javax.sip.address.*;
 import javax.sip.header.*;
 import javax.sip.message.*;
 
+import org.apache.log4j.Logger;
+
 import app.softphone.core.cuentas.Cuenta;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
@@ -42,6 +45,7 @@ public class OperacionesSip  implements SipListener {
 	  static final int RINGING=5;
 	  static final int WAIT_ACK=6;
 
+	  static Logger log = Logger.getLogger("softphone");
 	  
 	  
 	  private SecureRandom random = new SecureRandom();
@@ -118,8 +122,7 @@ public class OperacionesSip  implements SipListener {
 			  request.addHeader(eh);
 			  ClientTransaction transaction = udp.getNewClientTransaction(request);
 			  transaction.sendRequest();
-			  System.out.println("Sent request:");
-			  System.out.println(request);
+			  log.info("Sent request:\n" + request.toString());
 		  } catch(Exception e) {
 			  	System.out.println(e.getMessage());
 		}
@@ -182,8 +185,8 @@ public class OperacionesSip  implements SipListener {
 	  }
 	 
 	  public void removeListener() {
-		  udp.removeSipListener(this);
 		  try {
+			  udp.removeSipListener(this);
 			  sipStack.deleteSipProvider(udp);
 			  sipStack.deleteListeningPoint(udpPoint);
 		  } catch(Exception e) {
@@ -202,8 +205,7 @@ public class OperacionesSip  implements SipListener {
 	  public void processResponse(ResponseEvent event) {
 		  try {
 			  Response response = event.getResponse();
-			  System.out.println("Response received:");
-			  System.out.println(response);
+			  log.info("Response received:\n" + response.toString());
 			  	if (response.getStatusCode() == 401) {
 				        ClientTransaction tid = event.getClientTransaction();
 				        AccountManagerImpl manager = new AccountManagerImpl();
@@ -211,8 +213,7 @@ public class OperacionesSip  implements SipListener {
 				        ClientTransaction transaction = helper.handleChallenge(response, tid, udp, 5);
 				        transaction.sendRequest();
 				        Request request = transaction.getRequest();
-				        System.out.println("Sent request with authentication info:");
-				        System.out.println(request);
+				        log.info("Sent request with authentication info:\n" + request.toString());
 			        }
 			        
 			        switch (status) {
