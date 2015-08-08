@@ -81,14 +81,14 @@ public class OperacionesSip  implements SipListener {
 			            try {
 							Thread.sleep (400);
 						} catch (Exception ex) {
-							System.out.println(ex.getMessage());
+							log.error(ex.getMessage());
 						} 
 			         } 
 			     }; 
 			  Timer timer = new Timer();
 			  timer.scheduleAtFixedRate(registerTask, 0, 500000);
 		  } catch(Exception e) {
-			  System.out.println(e.getMessage());
+			  log.error(e.getMessage());
 		  }
 		  status = IDLE;
 	  }
@@ -124,7 +124,7 @@ public class OperacionesSip  implements SipListener {
 			  transaction.sendRequest();
 			  log.info("Sent request:\n" + request.toString());
 		  } catch(Exception e) {
-			  	System.out.println(e.getMessage());
+			  	log.error(e.getMessage());
 		}
 	  }
 
@@ -137,7 +137,7 @@ public class OperacionesSip  implements SipListener {
 			  		}
 			  }
 		  } catch(Exception e) {
-			  System.out.println(e.getMessage());
+			  log.error(e.getMessage());
 		  }
 		  
 	  }
@@ -190,7 +190,7 @@ public class OperacionesSip  implements SipListener {
 			  sipStack.deleteSipProvider(udp);
 			  sipStack.deleteListeningPoint(udpPoint);
 		  } catch(Exception e) {
-			  System.out.println(e.getMessage());
+			  log.error(e.getMessage());
 		  }
 	  }
 	  
@@ -241,6 +241,7 @@ public class OperacionesSip  implements SipListener {
 	    	switch (status) {
 	    		case REGISTER:
 	    			registro = false;
+	    			log.info("Timeout exceeded:\n" + timeoutEvent.getTimeout().toString());
 	        		status = IDLE;
 	        		break;
 	        }

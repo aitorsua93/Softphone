@@ -135,9 +135,11 @@ public class Principal {
 			public void actionPerformed(ActionEvent e) {
 				String destinatario = llamarField.getText();
 				if (!destinatario.equals("") && !(iniciarSesion.isEnabled())) {
-					JPanel llamada = new Llamada();
-					pestanas.insertTab("Llamada", null, llamada, null, 0);
-					pestanas.setSelectedIndex(0);
+					opSip = is.getOpSip();
+					cuenta = is.getCuenta();
+					JPanel llamada = new Llamada(opSip,cuenta,destinatario,pestanas);
+					pestanas.addTab("Llamada",llamada);
+					pestanas.setSelectedIndex(3);
 					llamarField.setText("");	
 				}	
 			}
