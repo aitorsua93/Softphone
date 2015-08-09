@@ -23,6 +23,9 @@ public class OperacionesSip  implements SipListener {
 	  AddressFactory address;
 	  MessageFactory message;
 	  ListeningPoint udpPoint;
+	  ContactHeader contactHeader;
+	  Address fromAddress;
+	  //SdpInfo offerInfo;
 	  String sipId;
 	  String myIp;
 	  int myPort = 5060;
@@ -46,8 +49,7 @@ public class OperacionesSip  implements SipListener {
 	  static final int WAIT_ACK=6;
 
 	  static Logger log = Logger.getLogger("softphone");
-	  
-	  
+	 
 	  private SecureRandom random = new SecureRandom();
 
 	  public String nextTag() {
@@ -73,6 +75,15 @@ public class OperacionesSip  implements SipListener {
 			  udpPoint = sipStack.createListeningPoint(myIp, myPort, "udp");
 			  udp = sipStack.createSipProvider(udpPoint);
 			  udp.addSipListener(this);
+			  
+			  SipURI myRealmURI = address.createSipURI(sipId, asteriskIp);
+			  fromAddress = address.createAddress(myRealmURI);
+			  
+			  SipURI myURI = address.createSipURI(sipId, myIp);
+			  myURI.setPort(myPort);
+			  Address contactAddress = address.createAddress(myURI);
+			  contactHeader = header.createContactHeader(contactAddress);
+			  
 			  TimerTask registerTask = new TimerTask() 
 			     { 
 			         public void run()  
@@ -95,34 +106,29 @@ public class OperacionesSip  implements SipListener {
 	  
 	  public void register(int expires) {
 		  try {
-			  status = REGISTER;
-			  String tag = nextTag();
-
-			  SipURI myRealmURI = address.createSipURI(sipId, asteriskIp);
-			  Address fromAddress = address.createAddress(myRealmURI);
-			  FromHeader fromHeader = header.createFromHeader(fromAddress, tag);
-			  SipURI myURI = address.createSipURI(sipId, myIp);
-			  myURI.setPort(myPort);
-			  Address contactAddress = address.createAddress(myURI);
-			  ContactHeader contactHeader = header.createContactHeader(contactAddress);
-	
-			  MaxForwardsHeader maxForwards = header.createMaxForwardsHeader(5);
-	
-			  List<ViaHeader> viaHeaders = new ArrayList<>();
-			  CallIdHeader callIdHeader = udp.getNewCallId();
-			  CSeqHeader cSeqHeader = header.createCSeqHeader(seq+3, Request.REGISTER);
-			  ToHeader toHeader = header.createToHeader(fromAddress, null);
-			  URI requestURI = address.createURI("sip:"+asteriskIp+":"+asteriskPort+";maddr="+asteriskIp);
-		    
-	
-			  Request request = message.createRequest(requestURI, Request.REGISTER, callIdHeader,
-		            cSeqHeader, fromHeader, toHeader, viaHeaders, maxForwards);
-			  request.addHeader(contactHeader);
-			  ExpiresHeader eh = header.createExpiresHeader(expires);
-			  request.addHeader(eh);
-			  ClientTransaction transaction = udp.getNewClientTransaction(request);
-			  transaction.sendRequest();
-			  log.info("Sent request:\n" + request.toString());
+			  if (status == IDLE) {
+				  String tag = nextTag();
+				  FromHeader fromHeader = header.createFromHeader(fromAddress, tag);
+		
+				  MaxForwardsHeader maxForwards = header.createMaxForwardsHeader(5);
+		
+				  List<ViaHeader> viaHeaders = new ArrayList<>();
+				  CallIdHeader callIdHeader = udp.getNewCallId();
+				  CSeqHeader cSeqHeader = header.createCSeqHeader(seq+3, Request.REGISTER);
+				  ToHeader toHeader = header.createToHeader(fromAddress, null);
+				  URI requestURI = address.createURI("sip:"+asteriskIp+":"+asteriskPort+";maddr="+asteriskIp);
+			    
+		
+				  Request request = message.createRequest(requestURI, Request.REGISTER, callIdHeader,
+			            cSeqHeader, fromHeader, toHeader, viaHeaders, maxForwards);
+				  request.addHeader(contactHeader);
+				  ExpiresHeader eh = header.createExpiresHeader(expires);
+				  request.addHeader(eh);
+				  ClientTransaction transaction = udp.getNewClientTransaction(request);
+				  transaction.sendRequest();
+				  status = REGISTER;
+				  log.info("Sent request:\n" + request.toString());
+			  }
 		  } catch(Exception e) {
 			  	log.error(e.getMessage());
 		}
@@ -133,6 +139,27 @@ public class OperacionesSip  implements SipListener {
 			  switch (status) {
 			  	case IDLE:
 			  		if (type == YES) {
+			  			Address toAddress = address.createAddress(destination);
+			  			ToHeader myToHeader = header.createToHeader(toAddress, null);
+			  			
+			  			String tag = nextTag();
+			  			FromHeader fromHeader = header.createFromHeader(fromAddress, tag);
+			  			
+			  			ViaHeader myViaHeader = header.createViaHeader(myIp, myPort, "udp", null);
+			  			ArrayList<ViaHeader> myViaHeaders = new ArrayList<ViaHeader>();
+			  			myViaHeaders.add(myViaHeader);
+			  			
+			  			MaxForwardsHeader myMaxForwardsHeader = header.createMaxForwardsHeader(70);
+			  			CSeqHeader myCSeqHeader = header.createCSeqHeader(seq+3,"INVITE");
+			  			CallIdHeader myCallIdHeader = udp.getNewCallId();
+			  			URI myRequestURI = toAddress.getURI();
+			  			
+			  			Request myRequest = message.createRequest(myRequestURI, "INVITE", myCallIdHeader, myCSeqHeader, fromHeader, 
+			  					myToHeader, myViaHeaders, myMaxForwardsHeader);
+			  			myRequest.addHeader(contactHeader);
+			  			
+			  			//offerInfo = new SdpInfo();
+			  			
 			  			break;
 			  		}
 			  }
