@@ -50,11 +50,11 @@ public class TonesTool implements ControllerListener {
 	public synchronized void stopTone() {
 		
 		try {
-			
-		} catch(Exception e) {
 			end = true;
 			notify();
 			player.stop();
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 		
