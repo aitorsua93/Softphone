@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -22,18 +24,46 @@ public class Llamada extends JPanel {
 	JLabel destLabel, destCompLabel, statusLabel, cronometro;
 	JPanel panelLabels, panelBotLlam;
 	JButton colgarLlam, ponEsper, Linea1, Linea2;
+	Cronometro cron;
 	Thread crono;
+	int status;
+	static final int IDLE=0;
+	static final int WAIT_FINAL=2;
+	static final int ESTABLISHED=4;
+	static final int RINGING=5;
 	
 	public Llamada(OperacionesSip opSip, Cuenta cuenta, String destinatario, JTabbedPane pestanas) {
 		cronometro = new JLabel("00:00:00");
 		cronometro.setFont(new java.awt.Font("Calibri", 1, 15));
 		Cronometro cron = new Cronometro(cronometro);
 		crearLabels(destinatario,cuenta,cronometro);
-		crearBotonesLlam(pestanas);
+		crearBotonesLlam(pestanas, opSip);
 		add(panelLabels, BorderLayout.WEST);
 		add(panelBotLlam, BorderLayout.SOUTH);
 		crono = new Thread(cron);
-		crono.start();
+		TimerTask llamadaTask = new TimerTask() { 
+		  public void run() { 
+			  status = opSip.getStatus();
+			  switch(status) {
+			  	case IDLE:
+			  		if (pestanas.getTabCount() == 4) {
+			  			pestanas.remove(3);
+			  		}
+			  		break;
+			  	case RINGING:
+			  		statusLabel.setText("Ringing...");
+			  		break;
+			  	case ESTABLISHED:
+			  		statusLabel.setText("Establecida");
+			  		if (!crono.isAlive()){
+			  			crono.start();
+			  		}
+			  			
+			  }
+		  }
+		}; 
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(llamadaTask, 50, 50);
 	}
 	
 	public void crearLabels(String destinatario, Cuenta c, JLabel cronometro) {
@@ -57,7 +87,7 @@ public class Llamada extends JPanel {
 		panelLabels.add(Box.createRigidArea(new Dimension (10,40)));
 	}
 	
-	public void crearBotonesLlam(JTabbedPane pestanas) {
+	public void crearBotonesLlam(JTabbedPane pestanas, OperacionesSip opSip) {
 		panelBotLlam = new JPanel(new GridLayout(3,3,10,10));
 		
 		colgarLlam = new JButton();
@@ -66,8 +96,8 @@ public class Llamada extends JPanel {
 		ActionListener colgarListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//Mandar peticion
-				 pestanas.remove(3);
+				opSip.call(1, null);
+				pestanas.remove(3);
 			}
 		};
 		colgarLlam.addActionListener(colgarListener);
@@ -88,7 +118,8 @@ public class Llamada extends JPanel {
 		panelBotLlam.add(Box.createRigidArea(new Dimension (10,20)));
 	}
 	
-
-
+	public Thread getCrono() {
+		return this.crono;
+	}
 	
 }

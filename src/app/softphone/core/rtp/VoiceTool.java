@@ -6,6 +6,7 @@ import java.util.Vector;
 import javax.media.CaptureDeviceInfo;
 import javax.media.CaptureDeviceManager;
 import javax.media.Manager;
+import javax.media.MediaLocator;
 import javax.media.Player;
 import javax.media.Processor;
 import javax.media.control.TrackControl;
@@ -31,15 +32,26 @@ public class VoiceTool implements ReceiveStreamListener {
 	private AudioFormat af = null;
 	
 	
+	public static void main(String[] args) {
+		try {
+			//AudioFormat df = new AudioFormat(AudioFormat.LINEAR,8000,8,1);
+			//Vector devices = CaptureDeviceManager.getDeviceList(null);
+			//CaptureDeviceInfo di = (CaptureDeviceInfo) devices.elementAt(0);
+			MediaLocator ml = new MediaLocator("javasound://44100");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void startMedia(String peerIP, int peerPort, int recvPort, int fmt, String myIP) {
 		
 		try {
 			
-			AudioFormat df = new AudioFormat(AudioFormat.LINEAR,8000,8,1);
+			/*AudioFormat df = new AudioFormat(AudioFormat.LINEAR,8000,8,1);
 			Vector devices = CaptureDeviceManager.getDeviceList(df);
-			CaptureDeviceInfo di = (CaptureDeviceInfo) devices.elementAt(0);
-			DataSource daso = Manager.createDataSource(di.getLocator());
-			
+			CaptureDeviceInfo di = (CaptureDeviceInfo) devices.elementAt(0);*/
+			MediaLocator ml = new MediaLocator("javasound://44100");
+			DataSource daso = Manager.createDataSource(ml);
 			myProcessor = Manager.createProcessor(daso);
 			myProcessor.configure();
 			while (myProcessor.getState() != Processor.Configured) {

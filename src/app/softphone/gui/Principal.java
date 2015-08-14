@@ -6,6 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.swing.*;
 
 import app.softphone.core.cuentas.Cuenta;
@@ -19,11 +22,20 @@ public class Principal {
 	JPanel zonaLlamar;
 	JTextField llamarField;
 	JButton llamarBut;
-	OperacionesSip opSip;
+	OperacionesSip opSip = null;
 	Cuenta cuenta;
 	IniciarSesion is;
 	JMenuItem iniciarSesion;
+	String sipLlam, usuarioLlam;
+	static final int IDLE=0;
+	static final int WAIT_PROV=1;
+	static final int WAIT_FINAL=2;
+	static final int ESTABLISHED=4;
+	static final int RINGING=5;
+	static final int WAIT_ACK=6;
+	int status;
 	Log l = new Log();
+	RecibirLlamada rl = null;
 	
 	
 	public static void main(String[] args) {
@@ -36,6 +48,28 @@ public class Principal {
 		crearZonaLlamar();
 		crearPestanas();
 		crearVentana();
+		/*TimerTask recibirLlamadaTask = new TimerTask() { 
+			  public void run() { 
+				  if (opSip != null) {
+					  status = opSip.getStatus();
+					  switch(status) {
+					  	case IDLE:
+					  		if (rl != null) {	//PUEDE PETAR CUANDO ACEPTES LLAMADA ENTRANTE
+					  			rl.dispose();
+					  			rl = null;
+					  		}
+					  	case RINGING:
+					  		sipLlam = opSip.getSipLlam();
+					  		usuarioLlam = opSip.getUsuarioLlam();
+					  		rl = new RecibirLlamada(usuarioLlam,sipLlam,opSip);
+					  		rl.setVisible(true);
+					  		break;
+					  }
+				  }
+			  }
+			}; 
+			Timer timer = new Timer();
+			timer.scheduleAtFixedRate(recibirLlamadaTask, 0, 100);*/
 	}
 	
 	
@@ -140,7 +174,8 @@ public class Principal {
 					JPanel llamada = new Llamada(opSip,cuenta,destinatario,pestanas);
 					pestanas.addTab("Llamada",llamada);
 					pestanas.setSelectedIndex(3);
-					llamarField.setText("");	
+					llamarField.setText("");
+					opSip.call(0, destinatario);
 				}	
 			}
 		};

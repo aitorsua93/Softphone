@@ -7,6 +7,9 @@ import javax.sip.*;
 import javax.sip.address.*;
 import javax.sip.header.*;
 import javax.sip.message.*;
+import javax.swing.JOptionPane;
+
+
 
 import org.apache.log4j.Logger;
 
@@ -15,6 +18,7 @@ import app.softphone.core.rtp.TonesTool;
 import app.softphone.core.rtp.VoiceTool;
 import app.softphone.core.sdp.SdpInfo;
 import app.softphone.core.sdp.SdpManager;
+import app.softphone.gui.RecibirLlamada;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -31,6 +35,7 @@ public class OperacionesSip  implements SipListener {
 	  Dialog myDialog;
 	  ListeningPoint udpPoint;
 	  ContactHeader contactHeader;
+	  AuthorizationHeader ah;
 	  Address fromAddress;
 	  SdpManager mySdpManager;
 	  SdpInfo offerInfo;
@@ -40,11 +45,14 @@ public class OperacionesSip  implements SipListener {
 	  TonesTool myRingTool;
 	  String sipId;
 	  String myIp;
+	  String sipLlam;
+	  String usuarioLlam;
 	  int myPort = 5060;
-	  int audioPort = 4000;
+	  int audioPort = 40000;
 	  int audioFormat = 3;
 	  String myPw;
 	  String asteriskIp;
+	  String tag;
 	  long seq = 1;
 	  int asteriskPort = 5060;
 	  Cuenta cuentaGlob;
@@ -54,7 +62,7 @@ public class OperacionesSip  implements SipListener {
 	  static final int YES=0;
 	  static final int NO=1;
 
-	  static final int REGISTER=0;
+	  static final int REGISTER=-1;
 	  static final int IDLE=0;
 	  static final int WAIT_PROV=1;
 	  static final int WAIT_FINAL=2;
@@ -65,10 +73,6 @@ public class OperacionesSip  implements SipListener {
 	  static Logger log = Logger.getLogger("softphone");
 	 
 	  private SecureRandom random = new SecureRandom();
-
-	  public String nextTag() {
-	    return new BigInteger(32, random).toString(64);
-	  }
 	  
 	  public OperacionesSip(String myIp, Cuenta c) {
 		  this.myIp = myIp;
@@ -109,15 +113,14 @@ public class OperacionesSip  implements SipListener {
 			  Address contactAddress = address.createAddress(myURI);
 			  contactHeader = header.createContactHeader(contactAddress);
 			  
-			  TimerTask registerTask = new TimerTask() 
-			     { 
+			  TimerTask registerTask = new TimerTask() { 
 			         public void run()  
 			         { 
 			            register(3600);
 			            try {
 							Thread.sleep (400);
 						} catch (Exception ex) {
-							log.error(ex.getMessage());
+							System.out.println(ex.getMessage());
 						} 
 			         } 
 			     }; 
@@ -127,6 +130,37 @@ public class OperacionesSip  implements SipListener {
 			  log.error(e.getMessage());
 		  }
 		  status = IDLE;
+	  }
+	  
+	  
+	  public String getSipLlam() {
+		  return this.sipLlam;
+	  }
+	  
+	  public String getUsuarioLlam() {
+		  return this.usuarioLlam;
+	  }
+	  
+	  public String nextTag() {
+		  return new BigInteger(32, random).toString(64);
+	  }
+		  
+	  public int getStatus() {
+		  return this.status;
+	  }
+	  
+	  public boolean getRegistro() {
+		  return this.registro;
+	  }
+	 
+	  public void removeListener() {
+		  try {
+			  udp.removeSipListener(this);
+			  sipStack.deleteSipProvider(udp);
+			  sipStack.deleteListeningPoint(udpPoint);
+		  } catch(Exception e) {
+			  log.error(e.getMessage());
+		  }
 	  }
 	  
 	  public void register(int expires) {
@@ -141,7 +175,7 @@ public class OperacionesSip  implements SipListener {
 				  CallIdHeader callIdHeader = udp.getNewCallId();
 				  CSeqHeader cSeqHeader = header.createCSeqHeader(seq+3, Request.REGISTER);
 				  ToHeader toHeader = header.createToHeader(fromAddress, null);
-				  URI requestURI = address.createURI("sip:"+asteriskIp+":"+asteriskPort+";maddr="+asteriskIp);
+				  URI requestURI = address.createURI("sip:"+asteriskIp+":"+asteriskPort);
 			    
 		
 				  Request request = message.createRequest(requestURI, Request.REGISTER, callIdHeader,
@@ -152,7 +186,7 @@ public class OperacionesSip  implements SipListener {
 				  myClientTransaction = udp.getNewClientTransaction(request);
 				  myClientTransaction.sendRequest();
 				  status = REGISTER;
-				  log.info("Sent request:\n" + request.toString());
+				  log.info("Sent REGISTER request:\n" + request.toString());
 			  }
 		  } catch(Exception e) {
 			  	log.error(e.getMessage());
@@ -160,11 +194,13 @@ public class OperacionesSip  implements SipListener {
 	  }
 
 	  public void call(int type, String destination) {
+
 		  try {
 			  switch (status) {
 			  	case IDLE:
 			  		if (type == YES) {
-			  			Address toAddress = address.createAddress(destination);
+			  			SipURI dest = address.createSipURI(destination, asteriskIp);
+			  			Address toAddress = address.createAddress(dest);
 			  			ToHeader myToHeader = header.createToHeader(toAddress, null);
 			  			
 			  			String tag = nextTag();
@@ -196,8 +232,73 @@ public class OperacionesSip  implements SipListener {
 			  			String bid = myClientTransaction.getBranchId();
 			  			
 			  			myClientTransaction.sendRequest();
+			  			log.info("Send INVITE request:\n" + myRequest.toString());
 			  			myDialog = myClientTransaction.getDialog();
 			  			status = WAIT_PROV;
+			  		}
+			  		break;
+			  		
+			  	case WAIT_FINAL:
+			  		if (type == NO) {
+			  			status = IDLE;
+			  			Request myCancelRequest = myClientTransaction.createCancel();
+			  			ClientTransaction myCancelClientTransaction = udp.getNewClientTransaction(myCancelRequest);
+			  			myCancelRequest.addHeader(ah);
+			  			myCancelClientTransaction.sendRequest();
+			  			log.info("Send CANCEL request:\n" + myCancelRequest.toString());
+			  			//myRingTool.stopTone();
+			  		}
+			  		break;
+			  		
+			  	case ESTABLISHED:
+			  		if (type == NO) {
+			  			Request myBye = myDialog.createRequest("BYE");
+			  			String uri = ((ToHeader)myBye.getHeader("To")).getAddress().getURI().toString();
+		        		URI requestBye = address.createURI(uri + ":" + asteriskPort);
+		        		myBye.setRequestURI(requestBye);
+			  			myBye.addHeader(contactHeader);
+			  			myClientTransaction = udp.getNewClientTransaction(myBye);
+			  			myDialog.sendRequest(myClientTransaction);
+			  			log.info("Send BYE request:\n" + myBye.toString());
+			  			
+			  			//myVoiceTool.stopMedia();
+			  			
+			  			status = IDLE;
+			  		}
+			  		break;
+			  		
+			  	case RINGING:
+			  		if (type == NO) {
+			  			Request originalRequest = myServerTransaction.getRequest();
+			  			Response myResponse  = message.createResponse(486,originalRequest);
+			  			myServerTransaction.sendResponse(myResponse);
+			  			status = IDLE;
+			  			
+			  			log.info("Send BUSY response:\n" + myResponse.toString());
+			  			
+			  			//myAlertTool.stopTone();
+			  			break;
+			  		} else if (type == YES) {
+			  			Request originalRequest = myServerTransaction.getRequest();
+			  			Response myResponse = message.createResponse(200, originalRequest);
+			  			ToHeader myToHeader = (ToHeader) myResponse.getHeader("To");
+			  			myToHeader.setTag(tag);
+			  			myResponse.addHeader(contactHeader);
+			  			
+			  			//myAlertTool.stopTone();
+			  			
+			  			ContentTypeHeader contentTypeHeader = header.createContentTypeHeader("application", "sdp");
+			  			byte[] content = mySdpManager.createSdp(answerInfo);
+			  			myResponse.setContent(content, contentTypeHeader);
+			  			
+			  			//myVoiceTool.startMedia(offerInfo.getIpAddress(), offerInfo.getAPort(), answerInfo.getAPort(), offerInfo.getAFormat(), myIp);
+			  			
+			  			myServerTransaction.sendResponse(myResponse);
+			  			myDialog = myServerTransaction.getDialog();
+			  			
+			  			status = WAIT_ACK;
+			  			
+			  			log.info("Send 200 OK response:\n" + myResponse.toString());
 			  			
 			  			break;
 			  		}
@@ -207,25 +308,124 @@ public class OperacionesSip  implements SipListener {
 		  }
 		  
 	  }
-
-	  
-	  public boolean getRegistro() {
-		  return this.registro;
-	  }
-	 
-	  public void removeListener() {
-		  try {
-			  udp.removeSipListener(this);
-			  sipStack.deleteSipProvider(udp);
-			  sipStack.deleteListeningPoint(udpPoint);
-		  } catch(Exception e) {
-			  log.error(e.getMessage());
-		  }
-	  }
 	  
 	  @Override
-	  public void processRequest(RequestEvent requestEvent) {
-	    	
+	  public void processRequest(RequestEvent requestReceivedEvent) {
+		  Request myRequest = requestReceivedEvent.getRequest();
+		  log.info("Request received\n" + myRequest.toString());
+		  String method = myRequest.getMethod();
+		  if (!method.equals("CANCEL")) {
+			  myServerTransaction = requestReceivedEvent.getServerTransaction();
+		  }
+		  try {
+			  switch(status) {
+			  
+			  	/*case IDLE:
+			  		if (method.equals("INVITE")) {
+			  			if (myServerTransaction == null) {
+			  				myServerTransaction = udp.getNewServerTransaction(myRequest);
+			  			}
+			  			
+			  			ContactHeader ch = (ContactHeader) myRequest.getHeader("Contact");
+			  			usuarioLlam = ch.getName().toString();
+			  			sipLlam = ch.getAddress().toString();
+			  			//myAlertTool.playTone();
+			  			
+			  			byte[] cont = (byte[]) myRequest.getContent();
+			  			offerInfo = mySdpManager.getSdp(cont);
+			  			
+			  			answerInfo.setIpAddress(myIp);
+			  			answerInfo.setAPort(audioPort);
+			  			answerInfo.setAFormat(audioFormat);
+			  			
+			  			Response myResponse = message.createResponse(180, myRequest);
+			  			myResponse.addHeader(contactHeader);
+			  			ToHeader myToHeader = (ToHeader) myResponse.getHeader("To");
+			  			tag = nextTag();
+			  			myToHeader.setTag(tag);
+			  			myServerTransaction.sendResponse(myResponse);
+			  			myDialog = myServerTransaction.getDialog();
+			  			
+			  			log.info("Send RINGING response:\n" + myResponse.toString());
+			  			
+			  			status = RINGING;
+			  			
+			  			RecibirLlamada rl = new RecibirLlamada(usuarioLlam,sipLlam,this);
+			  			rl.setVisible(true);
+			  		}
+			  		break;*/
+				  
+			  	case ESTABLISHED:
+			  		if (method.equals("BYE")) {
+			  			Response myResponse = message.createResponse(200, myRequest);
+			  			myResponse.addHeader(contactHeader);
+			  			myServerTransaction.sendResponse(myResponse);
+			  			log.info("Send response:\n" + myResponse.toString());
+			  			
+			  			//myVoiceTool.stopMedia();
+			  			
+			  			status = IDLE;
+			  		} else if(method.equals("INVITE")){
+			  			if (myServerTransaction == null) {
+			  				myServerTransaction = udp.getNewServerTransaction(myRequest);
+			  			}
+			  			
+			  			byte[] cont = (byte[]) myRequest.getContent();
+			  			offerInfo = mySdpManager.getSdp(cont);
+			  			
+			  			answerInfo.setIpAddress(myIp);
+			  			answerInfo.setAPort(audioPort);
+			  			answerInfo.setAFormat(audioFormat);
+			  			
+			  			Response myResponse = message.createResponse(200, myRequest);
+			  			myResponse.addHeader(contactHeader);
+			  			
+			  			ContentTypeHeader contentTypeHeader = header.createContentTypeHeader("application", "sdp");
+			  			byte[] content = mySdpManager.createSdp(answerInfo);
+			  			myResponse.setContent(content, contentTypeHeader);
+			  			
+			  			//myVoiceTool.startMedia(offerInfo.getIpAddress(),offerInfo.getAPort(),answerInfo.getAPort(),offerInfo.getAFormat(),myIp);
+			  			
+			  			myServerTransaction.sendResponse(myResponse);
+			  			myDialog = myServerTransaction.getDialog();
+			  			
+			  			log.info("Send Response:\n" + myResponse.toString());
+			  			
+			  			status = WAIT_ACK;
+			  		}
+			  		break;
+			  		
+			  
+			  	case RINGING:
+			  		if (method.equals("CANCEL")) {
+			  			ServerTransaction myCancelServerTransaction  = requestReceivedEvent.getServerTransaction();
+			  			Request originalRequest = myServerTransaction.getRequest();
+			  			Response myResponse = message.createResponse(487, originalRequest);
+			  			myServerTransaction.sendResponse(myResponse);
+			  			Response myCancelResponse = message.createResponse(200, myRequest);
+			  			myCancelServerTransaction.sendResponse(myCancelResponse);
+			  			
+			  			//myAlertTool.stopTone();
+			  			
+			  			log.info("Send Response:\n" + myResponse.toString());
+			  			log.info("Send Response:\n"+ myCancelResponse.toString());
+			  			
+			  			status = IDLE;
+			  		}
+			  		break;
+			  	
+			  	case WAIT_ACK:
+			  		if (method.equals("ACK")) {
+			  			status = ESTABLISHED;
+			  		}
+			  		break;
+			  
+			  
+			  }
+			  
+		  } catch(Exception e) {
+			  e.printStackTrace();
+		  }
 	  }
 	    
 	 
@@ -236,67 +436,111 @@ public class OperacionesSip  implements SipListener {
 			  Response myResponse = responseReceivedEvent.getResponse();
 			  log.info("Response received:\n" + myResponse.toString());
 			  ClientTransaction thisClientTransaction = responseReceivedEvent.getClientTransaction();
+			  	
 			  if (!thisClientTransaction.equals(myClientTransaction)) {
-				  return;
+					 return;
 			  }
+				  
 			  int myStatusCode = myResponse.getStatusCode();
 			  CSeqHeader originalCSeq = (CSeqHeader) myClientTransaction.getRequest().getHeader(CSeqHeader.NAME);
 			  long numseq = originalCSeq.getSeqNumber();
 			  
 			  	if (myStatusCode == 401) {
-				        AccountManagerImpl manager = new AccountManagerImpl();
-				        AuthenticationHelper helper = sipStack.getAuthenticationHelper(manager, header);
-				        ClientTransaction transaction = helper.handleChallenge(myResponse, thisClientTransaction, udp, 5);
-				        transaction.sendRequest();
-				        Request request = transaction.getRequest();
-				        log.info("Sent request with authentication info:\n" + request.toString());
-			        }
-			        
-			        switch (status) {
-			        	case REGISTER: 
-					        String[] expires = myResponse.getExpires().toString().split("\\s+");
-					        if (!(expires[1].equals("0")) ) {
-					        	if (myStatusCode == 200) {
-					        		registro = true;
-					        	}
-					        }
-					        if (myStatusCode == 403) {
-					        	registro = false;
-					        }
+			  		AccountManagerImpl manager = new AccountManagerImpl();
+				    AuthenticationHelper helper = sipStack.getAuthenticationHelper(manager, header);
+				    myClientTransaction = helper.handleChallenge(myResponse, thisClientTransaction, udp, 5);
+				    Request request = myClientTransaction.getRequest();
+				    ah = (AuthorizationHeader)request.getHeader("Authorization");
+				    ((SipURI) request.getRequestURI()).removeParameter("maddr");
+				    myClientTransaction.sendRequest();
+				    log.info("Sent request with authentication info:\n" + request.toString());
+				    return;
+			  	}
+			  	
+			    switch (status) {
+			    
+			     	case REGISTER: 
+			        	if (myStatusCode == 200) {
+					        registro = true;
+					    } else {
+					        registro = false;
+					    }
+					    status = IDLE;
+					    break;
 					        
-					        status = IDLE;
-					        break;
-					        
-			        	case WAIT_PROV:
-			        		if (myStatusCode < 200) {
-			        			status = WAIT_FINAL;
-			        			myDialog = thisClientTransaction.getDialog();
-			        			//myRingTool.playTone();
-			        		} else if (myStatusCode < 300) {
-			        			myDialog = thisClientTransaction.getDialog();
-			        			Request myAck = myDialog.createAck(numseq);
-			        			myAck.addHeader(contactHeader);
-			        			myDialog.sendAck(myAck);
-			        			//myRingTool.stopTone();
-			        			status = ESTABLISHED;
+			    	case IDLE:
+			    		
+			    		break;
+			    		
+			        case WAIT_PROV:
+			        	if (myStatusCode < 200) {
+			        		status = WAIT_FINAL;
+			        		myDialog = thisClientTransaction.getDialog();
+			        		//myRingTool.playTone();
+			        	} else if (myStatusCode < 300) {
+			        		myDialog = thisClientTransaction.getDialog();
+			        		Request myAck = myDialog.createAck(numseq);
+			        		String uri = ((ToHeader)myAck.getHeader("To")).getAddress().getURI().toString();
+			        		URI requestAck = address.createURI(uri + ":" + asteriskPort);
+			        		myAck.setRequestURI(requestAck);
+			        		myAck.addHeader(contactHeader);
+			        		myDialog.sendAck(myAck);
+			        		log.info("Send ACK:\n" + myAck.toString());
+			        		//myRingTool.stopTone();
+			        		status = ESTABLISHED;
 			        			
-			        			byte[] cont = (byte[]) myResponse.getContent();
-			        			answerInfo = mySdpManager.getSdp(cont);
+			        		byte[] cont = (byte[]) myResponse.getContent();
+			        		answerInfo = mySdpManager.getSdp(cont);
+			        		
+			        		//myVoiceTool.startMedia(answerInfo.getIpAddress(), answerInfo.getAPort(), offerInfo.getAPort(),answerInfo.getAFormat(), myIp);
+			        		
+			        	} else {
+			        		status = IDLE;
+			        		Request myAck  = myDialog.createAck(numseq);
+			        		String uri = ((ToHeader)myAck.getHeader("To")).getAddress().getURI().toString();
+			        		URI requestAck = address.createURI(uri + ":" + asteriskPort);
+			        		myAck.setRequestURI(requestAck);
+			        		myAck.addHeader(contactHeader);
+			        		myDialog.sendAck(myAck);
+			        		log.info("Send ACK:\n" + myAck.toString());
+			        		//myRingTool.stopTone();
+			        	}
+			        	break;
+			        	
+			        case WAIT_FINAL:
+			        	if (myStatusCode < 200) {
+			        		status = WAIT_FINAL;
+			        		myDialog = thisClientTransaction.getDialog();
+			        		//myRingTool.playTone();
+			        	} else if (myStatusCode < 300) {
+			        		status = ESTABLISHED;
+			        		myDialog = thisClientTransaction.getDialog();
+			        		Request myAck = myDialog.createAck(numseq);
+			        		String uri = ((ToHeader)myAck.getHeader("To")).getAddress().getURI().toString();
+			        		URI requestAck = address.createURI(uri + ":" + asteriskPort);
+			        		myAck.setRequestURI(requestAck);
+			        		myAck.addHeader(contactHeader);
+			        		myDialog.sendAck(myAck);
+			        		System.out.println("Send ACK:\n" + myAck.toString());
+			        		log.info("Send ACK:\n" + myAck.toString());
+			        		//myRingTool.stopTone();
 			        			
-			        			myVoiceTool.startMedia(answerInfo.getIpAddress(), answerInfo.getAPort(), offerInfo.getAPort(),answerInfo.getAFormat(), myIp);
-			        		} else {
-			        			status = IDLE;
-			        			Request myAck  = myDialog.createAck(numseq);
-			        			myAck.addFirst(contactHeader);
-			        			myDialog.sendAck(myAck);
-			        			//myRingTool.stopTone();
-			        		}
-			        		break;
-					  
+			        		byte[] cont = (byte[]) myResponse.getContent();
+			        		answerInfo = mySdpManager.getSdp(cont);
+			        			
+			        		//myVoiceTool.startMedia(answerInfo.getIpAddress(), answerInfo.getAPort(), offerInfo.getAPort(), answerInfo.getAFormat(), myIp);
+			        		log.info("Llamada establecida\n\n");
+			        	} else {
+			        		status = IDLE;
+			        		JOptionPane.showMessageDialog(null, myStatusCode + " " + myResponse.getReasonPhrase(),"Informacion", JOptionPane.INFORMATION_MESSAGE);
+			        		//myRingTool.stopTone();
+			        		
+			        	}
+			        	break;
+			     }
+			  } catch (Exception e) { 
+			     e.printStackTrace(); 
 			  }
-			      } catch (Exception e) { 
-			    	  e.printStackTrace(); 
-			      }
 	    }
 
 	    @Override
