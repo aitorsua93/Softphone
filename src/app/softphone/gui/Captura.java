@@ -11,6 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import app.softphone.core.preferencias.Configuracion;
+
 @SuppressWarnings("serial")
 public class Captura extends JPanel {
 	
@@ -18,8 +20,10 @@ public class Captura extends JPanel {
 	JCheckBox activarCaptura;
 	JLabel opcionesLabel, datosLabel, secLabel;
 	JTextField secCaptura;
+	Configuracion conf;
 	
-	public Captura() {
+	public Captura(Configuracion conf) {
+		this.conf = conf;
 		crearOpciones();
 		crearDatos();
 		setLayout(new BorderLayout());
@@ -36,6 +40,11 @@ public class Captura extends JPanel {
 		opciones.add(Box.createRigidArea(new Dimension (30,20)));
 		activarCaptura = new JCheckBox("Activar captura de llamadas");
 		opciones.add(activarCaptura);
+		if (conf.getCapturaOpcion().equals("Si")) {
+			activarCaptura.setSelected(true);
+		} else if (conf.getCapturaOpcion().equals("No")) {
+			activarCaptura.setSelected(false);
+		}
 		opciones.add(Box.createRigidArea(new Dimension (30,40)));
 		datosLabel = new JLabel("Datos captura de llamadas");
 		opciones.add(datosLabel);
@@ -49,6 +58,15 @@ public class Captura extends JPanel {
 		datos.add(secLabel);
 		secCaptura = new JTextField(5);
 		secCaptura.setMaximumSize(secCaptura.getPreferredSize());
+		secCaptura.setText(conf.getSecCaptura());
 		datos.add(secCaptura);
+	}
+	
+	public JCheckBox getActivarCaptura() {
+		return this.activarCaptura;
+	}
+	
+	public JTextField getSecCaptura() {
+		return this.secCaptura;
 	}
 }

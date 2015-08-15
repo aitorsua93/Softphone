@@ -13,6 +13,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
 import app.softphone.core.cuentas.Cuenta;
+import app.softphone.core.preferencias.Configuracion;
+import app.softphone.core.preferencias.OperacionesPreferencias;
 import app.softphone.core.sip.OperacionesSip;
 
 @SuppressWarnings("serial")
@@ -24,16 +26,19 @@ public class Preferencias extends JDialog {
 	
 
 	public Preferencias(OperacionesSip opSip, Cuenta c, JMenuItem in) {
-		crearPestanas(opSip,c,in);
+		OperacionesPreferencias opPre = new OperacionesPreferencias();
+		Configuracion conf = new Configuracion();
+		conf = opPre.obtenerPreferencias();
+		crearPestanas(opSip,c,in,conf);
 		crearPanelBotones();
 		crearVentana();
 	}
 
-	public void crearPestanas(OperacionesSip opSip, Cuenta c, JMenuItem in) {
+	public void crearPestanas(OperacionesSip opSip, Cuenta c, JMenuItem in, Configuracion conf) {
 		pestanas = new JTabbedPane();
 		cuenta = new Cuentas(opSip,c,in);
-		desvio = new Desvio();
-		captura = new Captura();
+		desvio = new Desvio(conf);
+		captura = new Captura(conf);
 		pestanas.addTab("Cuentas", cuenta);
 		pestanas.addTab("Desvio de Llamada", desvio);
 		pestanas.addTab("Captura de Llamada", captura);
@@ -45,6 +50,17 @@ public class Preferencias extends JDialog {
 		aceptarPre = new JButton();
 		aceptarPre.setText("Aceptar");
 		panelBotones.add(aceptarPre);
+		ActionListener aceptarPreListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Configuracion config = new Configuracion();
+				/*if () {
+					
+				}*/
+				dispose();
+			}
+		};
+		aceptarPre.addActionListener(aceptarPreListener);
 		
 		cancelarPre = new JButton();
 		cancelarPre.setText("Cancelar");

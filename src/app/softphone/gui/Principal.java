@@ -5,24 +5,20 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
-import java.util.Timer;
-import java.util.TimerTask;
-
 import javax.swing.*;
 
 import app.softphone.core.cuentas.Cuenta;
 import app.softphone.core.sip.OperacionesSip;
 
 
-public class Principal {
+public class Principal implements ActionListener{
 	JFrame ventana;
 	JMenuBar menuPrin;
 	JTabbedPane pestanas;
 	JPanel zonaLlamar;
 	JTextField llamarField;
 	JButton llamarBut;
-	OperacionesSip opSip = null;
+	OperacionesSip opSip;
 	Cuenta cuenta;
 	IniciarSesion is;
 	JMenuItem iniciarSesion;
@@ -48,30 +44,31 @@ public class Principal {
 		crearZonaLlamar();
 		crearPestanas();
 		crearVentana();
-		/*TimerTask recibirLlamadaTask = new TimerTask() { 
-			  public void run() { 
-				  if (opSip != null) {
-					  status = opSip.getStatus();
-					  switch(status) {
-					  	case IDLE:
-					  		if (rl != null) {	//PUEDE PETAR CUANDO ACEPTES LLAMADA ENTRANTE
-					  			rl.dispose();
-					  			rl = null;
-					  		}
-					  	case RINGING:
-					  		sipLlam = opSip.getSipLlam();
-					  		usuarioLlam = opSip.getUsuarioLlam();
-					  		rl = new RecibirLlamada(usuarioLlam,sipLlam,opSip);
-					  		rl.setVisible(true);
-					  		break;
-					  }
-				  }
-			  }
-			}; 
-			Timer timer = new Timer();
-			timer.scheduleAtFixedRate(recibirLlamadaTask, 0, 100);*/
+		Timer timer = new Timer(100,this);
+		timer.start();
 	}
 	
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		if (!(iniciarSesion.isEnabled())) {
+			  opSip = is.getOpSip();
+			  status = opSip.getStatus();
+			  switch(status) {
+			  	case IDLE:
+			  		if (pestanas.getTabCount() == 4) {
+			  			pestanas.remove(3);
+			  		}
+			  		break;
+			  	case RINGING:
+			  		sipLlam = opSip.getSipLlam();
+			  		usuarioLlam = opSip.getUsuarioLlam();
+			  		Cuenta c = is.getCuenta();
+			  		rl = new RecibirLlamada(usuarioLlam,sipLlam,opSip,c,pestanas);
+			  		rl.setVisible(true);
+			  		break;
+			  }
+		  }
+	}
 	
 	public void crearMenu() {
 		menuPrin = new JMenuBar();
@@ -205,5 +202,6 @@ public class Principal {
 		ventana.setResizable(false); // Evitar aumentar el tama�o de la ventana
 		ventana.setVisible(true); 
 	}
+
 
 }

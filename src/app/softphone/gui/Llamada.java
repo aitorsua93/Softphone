@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -14,16 +12,19 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.Timer;
 
 import app.softphone.core.cuentas.Cuenta;
 import app.softphone.core.sip.OperacionesSip;
 
 @SuppressWarnings("serial")
-public class Llamada extends JPanel {
+public class Llamada extends JPanel implements ActionListener{
 	
 	JLabel destLabel, destCompLabel, statusLabel, cronometro;
 	JPanel panelLabels, panelBotLlam;
 	JButton colgarLlam, ponEsper, Linea1, Linea2;
+	OperacionesSip opSip;
+	JTabbedPane pestanas;
 	Cronometro cron;
 	Thread crono;
 	int status;
@@ -33,6 +34,8 @@ public class Llamada extends JPanel {
 	static final int RINGING=5;
 	
 	public Llamada(OperacionesSip opSip, Cuenta cuenta, String destinatario, JTabbedPane pestanas) {
+		this.opSip = opSip;
+		this.pestanas = pestanas;
 		cronometro = new JLabel("00:00:00");
 		cronometro.setFont(new java.awt.Font("Calibri", 1, 15));
 		Cronometro cron = new Cronometro(cronometro);
@@ -41,30 +44,22 @@ public class Llamada extends JPanel {
 		add(panelLabels, BorderLayout.WEST);
 		add(panelBotLlam, BorderLayout.SOUTH);
 		crono = new Thread(cron);
-		TimerTask llamadaTask = new TimerTask() { 
-		  public void run() { 
-			  status = opSip.getStatus();
-			  switch(status) {
-			  	case IDLE:
-			  		if (pestanas.getTabCount() == 4) {
-			  			pestanas.remove(3);
-			  		}
-			  		break;
-			  	case RINGING:
-			  		statusLabel.setText("Ringing...");
-			  		break;
-			  	case ESTABLISHED:
-			  		statusLabel.setText("Establecida");
-			  		if (!crono.isAlive()){
-			  			crono.start();
-			  		}
-			  			
-			  }
-		  }
-		}; 
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(llamadaTask, 50, 50);
+		Timer timer = new Timer(100,this);
+		timer.start();
 	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		status = opSip.getStatus();
+		  switch(status) {
+		  	case ESTABLISHED:
+		  		statusLabel.setText("Establecida");
+		  		if (!crono.isAlive()){
+		  			crono.start();
+		  		}	
+		  }
+	}
+	
 	
 	public void crearLabels(String destinatario, Cuenta c, JLabel cronometro) {
 		panelLabels = new JPanel();
@@ -96,6 +91,7 @@ public class Llamada extends JPanel {
 		ActionListener colgarListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				System.out.println(opSip.getStatus());
 				opSip.call(1, null);
 				pestanas.remove(3);
 			}

@@ -114,8 +114,7 @@ public class OperacionesSip  implements SipListener {
 			  contactHeader = header.createContactHeader(contactAddress);
 			  
 			  TimerTask registerTask = new TimerTask() { 
-			         public void run()  
-			         { 
+			         public void run() { 
 			            register(3600);
 			            try {
 							Thread.sleep (400);
@@ -252,6 +251,7 @@ public class OperacionesSip  implements SipListener {
 			  		
 			  	case ESTABLISHED:
 			  		if (type == NO) {
+			  			System.out.println("Entro para enviar el BYE");
 			  			Request myBye = myDialog.createRequest("BYE");
 			  			String uri = ((ToHeader)myBye.getHeader("To")).getAddress().getURI().toString();
 		        		URI requestBye = address.createURI(uri + ":" + asteriskPort);
@@ -320,7 +320,7 @@ public class OperacionesSip  implements SipListener {
 		  try {
 			  switch(status) {
 			  
-			  	/*case IDLE:
+			  	case IDLE:
 			  		if (method.equals("INVITE")) {
 			  			if (myServerTransaction == null) {
 			  				myServerTransaction = udp.getNewServerTransaction(myRequest);
@@ -349,14 +349,12 @@ public class OperacionesSip  implements SipListener {
 			  			log.info("Send RINGING response:\n" + myResponse.toString());
 			  			
 			  			status = RINGING;
-			  			
-			  			RecibirLlamada rl = new RecibirLlamada(usuarioLlam,sipLlam,this);
-			  			rl.setVisible(true);
 			  		}
-			  		break;*/
+			  		break;
 				  
 			  	case ESTABLISHED:
 			  		if (method.equals("BYE")) {
+			  			System.out.println("Entro en el BYE");
 			  			Response myResponse = message.createResponse(200, myRequest);
 			  			myResponse.addHeader(contactHeader);
 			  			myServerTransaction.sendResponse(myResponse);
@@ -521,7 +519,6 @@ public class OperacionesSip  implements SipListener {
 			        		myAck.setRequestURI(requestAck);
 			        		myAck.addHeader(contactHeader);
 			        		myDialog.sendAck(myAck);
-			        		System.out.println("Send ACK:\n" + myAck.toString());
 			        		log.info("Send ACK:\n" + myAck.toString());
 			        		//myRingTool.stopTone();
 			        			

@@ -27,12 +27,12 @@ public class OperacionesCuenta {
 
 	
 	public static void main(String[] args) {
-		/*Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion",Estado.NO_REGISTRADO);
-		Cuenta cuenta2 = new Cuenta("2222","192.168.1.100","456","Secretaria",Estado.REGISTRADO);
-		Cuenta cuenta3 = new Cuenta("2222","192.168.1.102","456","Secretaria",Estado.REGISTRADO);
+		Cuenta cuenta1 = new Cuenta("1111","192.168.1.100","123","Administracion");
+		Cuenta cuenta2 = new Cuenta("2222","192.168.1.100","456","Secretaria");
+		Cuenta cuenta3 = new Cuenta("2222","192.168.1.102","456","Secretaria");
 		OperacionesCuenta op = new OperacionesCuenta();
-		//op.crear(cuenta1);
-		//op.crear(cuenta2);
+		op.crear(cuenta1);
+		/*//op.crear(cuenta2);
 		List<Cuenta> c = new ArrayList<Cuenta>();
 		Cuenta b;
 		//op.borrar("Santi");
@@ -77,15 +77,11 @@ public class OperacionesCuenta {
 			Element nuevoNombre = doc.createElement("nombre");
 			nuevoNombre.setTextContent(cuenta.getNombre());
 			
-			Element nuevoEstado = doc.createElement("estado");
-			nuevoEstado.setTextContent(cuenta.getEstado().getDescr());
-			
 			//agregar etiquetas a la nueva cuenta
 			nuevaCuenta.appendChild(nuevoUsuario);
 			nuevaCuenta.appendChild(nuevoServidor);
 			nuevaCuenta.appendChild(nuevoPassword);
 			nuevaCuenta.appendChild(nuevoNombre);
-			nuevaCuenta.appendChild(nuevoEstado);
 			
 			//relacionar la nueva cuenta con la etiqueta "cuentas"
 			nodoRaiz.appendChild(nuevaCuenta);
