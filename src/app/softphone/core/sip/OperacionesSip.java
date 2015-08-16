@@ -11,14 +11,17 @@ import javax.swing.JOptionPane;
 
 
 
+
+
 import org.apache.log4j.Logger;
 
 import app.softphone.core.cuentas.Cuenta;
+import app.softphone.core.preferencias.Configuracion;
+import app.softphone.core.preferencias.OperacionesPreferencias;
 import app.softphone.core.rtp.TonesTool;
 import app.softphone.core.rtp.VoiceTool;
 import app.softphone.core.sdp.SdpInfo;
 import app.softphone.core.sdp.SdpManager;
-import app.softphone.gui.RecibirLlamada;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -71,7 +74,7 @@ public class OperacionesSip  implements SipListener {
 	  static final int WAIT_ACK=6;
 
 	  static Logger log = Logger.getLogger("softphone");
-	 
+	  OperacionesPreferencias opPre = new OperacionesPreferencias();
 	  private SecureRandom random = new SecureRandom();
 	  
 	  public OperacionesSip(String myIp, Cuenta c) {
@@ -338,17 +341,48 @@ public class OperacionesSip  implements SipListener {
 			  			answerInfo.setAPort(audioPort);
 			  			answerInfo.setAFormat(audioFormat);
 			  			
-			  			Response myResponse = message.createResponse(180, myRequest);
-			  			myResponse.addHeader(contactHeader);
-			  			ToHeader myToHeader = (ToHeader) myResponse.getHeader("To");
-			  			tag = nextTag();
-			  			myToHeader.setTag(tag);
-			  			myServerTransaction.sendResponse(myResponse);
-			  			myDialog = myServerTransaction.getDialog();
+			  			Configuracion conf = opPre.obtenerPreferencias();
 			  			
-			  			log.info("Send RINGING response:\n" + myResponse.toString());
-			  			
-			  			status = RINGING;
+			  			if (conf.getDesvioSiempre().equals("Si")) {
+			  				Response myResponseTrying = message.createResponse(100, myRequest);
+			  				Response myResponseMoved = message.createResponse(302, myRequest);
+			  				
+			  				myResponseTrying.addHeader(contactHeader);
+			  				tag = nextTag();
+			  				ToHeader toHeaderTrying = (ToHeader) myResponseTrying.getHeader("To");
+			  				ToHeader toHeaderMoved = (ToHeader) myResponseMoved.getHeader("To");
+			  				toHeaderTrying.setTag(tag);
+			  				toHeaderMoved.setTag(tag);
+			  				String[] moved = conf.getURIdesvio().split("@");
+			  				SipURI myURI = address.createSipURI(moved[0], moved[1]);
+			  				Address contactAddressMoved = address.createAddress(myURI);
+			  				ContactHeader contactMoved = header.createContactHeader(contactAddressMoved);
+			  				myResponseMoved.addHeader(contactMoved);
+			  				myServerTransaction.sendResponse(myResponseTrying);
+			  				myServerTransaction.sendResponse(myResponseMoved);
+			  				myDialog = myServerTransaction.getDialog();
+			  				
+			  				log.info("Sent TRYING response:\n" + myResponseTrying.toString());
+			  				log.info("Sent MOVED TEMPORARILY response:\n" + myResponseMoved.toString());
+			  				
+			  				status =IDLE;
+			  			} else {
+				  			Response myResponse = message.createResponse(180, myRequest);
+				  			myResponse.addHeader(contactHeader);
+				  			ToHeader myToHeader = (ToHeader) myResponse.getHeader("To");
+				  			tag = nextTag();
+				  			myToHeader.setTag(tag);
+				  			myServerTransaction.sendResponse(myResponse);
+				  			myDialog = myServerTransaction.getDialog();
+				  			
+				  			log.info("Send RINGING response:\n" + myResponse.toString());
+				  			
+				  			status = RINGING;
+				  			
+				  			if (conf.getDesvioTimeout().equals("Si")) {
+				  				new Timer().schedule(new DesvioTimerTask(myRequest,conf), (Integer.parseInt(conf.getTimeoutDesvio())*1000));
+				  			}
+			  			}
 			  		}
 			  		break;
 				  
@@ -417,8 +451,6 @@ public class OperacionesSip  implements SipListener {
 			  			status = ESTABLISHED;
 			  		}
 			  		break;
-			  
-			  
 			  }
 			  
 		  } catch(Exception e) {
@@ -567,6 +599,37 @@ public class OperacionesSip  implements SipListener {
 	    }
 	 
 
+	    private class DesvioTimerTask extends TimerTask {
+	        Request request;
+	        Configuracion conf;
+	        public DesvioTimerTask (Request request, Configuracion conf){
+	                this.request = request;
+	                this.conf = conf;
+	              }
+	        public void run() {
+	          try{
+	  				Response myResponseMoved = message.createResponse(302, request);
+	  				
+	  				ToHeader toHeaderMoved = (ToHeader) myResponseMoved.getHeader("To");
+	  				toHeaderMoved.setTag(tag);
+	  				String[] moved = conf.getURIdesvio().split("@");
+	  				SipURI myURI = address.createSipURI(moved[0], moved[1]);
+	  				Address contactAddressMoved = address.createAddress(myURI);
+	  				ContactHeader contactMoved = header.createContactHeader(contactAddressMoved);
+	  				myResponseMoved.addHeader(contactMoved);
+	  				myServerTransaction.sendResponse(myResponseMoved);
+	  				myDialog = myServerTransaction.getDialog();
+	  				
+	  				log.info("Sent MOVED TEMPORARILY response:\n" + myResponseMoved.toString());
+	  				
+	  				status = IDLE;
+	          }catch (Exception ex){
+	            ex.printStackTrace();
+	        }
+	    }
+	}  
+	  
+	  
 	  private class AccountManagerImpl implements AccountManager {
 	    @Override
 	    public UserCredentials getCredentials(ClientTransaction clientTransaction, String s) {
