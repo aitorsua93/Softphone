@@ -56,7 +56,8 @@ public class Llamada extends JPanel implements ActionListener{
 		  		statusLabel.setText("Establecida");
 		  		if (!crono.isAlive()){
 		  			crono.start();
-		  		}	
+		  		}
+		  		break;
 		  }
 	}
 	

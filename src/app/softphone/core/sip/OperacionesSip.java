@@ -72,6 +72,7 @@ public class OperacionesSip  implements SipListener {
 	  static final int ESTABLISHED=4;
 	  static final int RINGING=5;
 	  static final int WAIT_ACK=6;
+	  static final int PICK_UP=7;
 
 	  static Logger log = Logger.getLogger("softphone");
 	  OperacionesPreferencias opPre = new OperacionesPreferencias();
@@ -177,7 +178,7 @@ public class OperacionesSip  implements SipListener {
 				  CallIdHeader callIdHeader = udp.getNewCallId();
 				  CSeqHeader cSeqHeader = header.createCSeqHeader(seq+3, Request.REGISTER);
 				  ToHeader toHeader = header.createToHeader(fromAddress, null);
-				  URI requestURI = address.createURI("sip:"+asteriskIp+":"+asteriskPort);
+				  URI requestURI = address.createURI("sip:" + asteriskIp + ":" + asteriskPort);
 			    
 		
 				  Request request = message.createRequest(requestURI, Request.REGISTER, callIdHeader,
@@ -215,7 +216,7 @@ public class OperacionesSip  implements SipListener {
 			  			MaxForwardsHeader myMaxForwardsHeader = header.createMaxForwardsHeader(70);
 			  			CSeqHeader myCSeqHeader = header.createCSeqHeader(seq+3,"INVITE");
 			  			CallIdHeader myCallIdHeader = udp.getNewCallId();
-			  			URI myRequestURI = toAddress.getURI();
+			  			URI myRequestURI = address.createURI("sip:" + destination + "@" + asteriskIp + ":" + asteriskPort);
 			  			
 			  			Request myRequest = message.createRequest(myRequestURI, "INVITE", myCallIdHeader, myCSeqHeader, fromHeader, 
 			  					myToHeader, myViaHeaders, myMaxForwardsHeader);
@@ -310,6 +311,43 @@ public class OperacionesSip  implements SipListener {
 			  log.error(e.getMessage());
 		  }
 		  
+	  }
+	  
+	  public void callTransfer(String destination) {
+		  try {
+			  SipURI dest = address.createSipURI(destination, asteriskIp);
+			  Address toAddress = address.createAddress(dest);
+			  ToHeader myToHeader = header.createToHeader(toAddress, null);
+			  
+			  String tag = nextTag();
+			  FromHeader fromHeader = header.createFromHeader(fromAddress, tag);
+			  ViaHeader myViaHeader = header.createViaHeader(myIp, myPort, "udp", null);
+			  ArrayList<ViaHeader> myViaHeaders = new ArrayList<ViaHeader>();
+			  myViaHeaders.add(myViaHeader);
+	  			
+			  MaxForwardsHeader myMaxForwardsHeader = header.createMaxForwardsHeader(70);
+			  CSeqHeader myCSeqHeader = header.createCSeqHeader(seq+3,"SUBSCRIBE");
+			  CallIdHeader myCallIdHeader = udp.getNewCallId();
+			  URI myRequestURI = address.createURI("sip:" + destination + "@" + asteriskIp + ":" + asteriskPort);
+			  
+			  Request myRequest = message.createRequest(myRequestURI, "SUBSCRIBE", myCallIdHeader, myCSeqHeader, fromHeader, 
+	  					myToHeader, myViaHeaders, myMaxForwardsHeader);
+			  myRequest.addHeader(contactHeader);
+			  EventHeader eventHeader = header.createEventHeader("dialog");
+			  myRequest.addHeader(eventHeader);
+			  ExpiresHeader expiresHeader = header.createExpiresHeader(0);
+			  myRequest.addHeader(expiresHeader);
+			  
+			  myClientTransaction = udp.getNewClientTransaction(myRequest);
+			  myClientTransaction.sendRequest();
+			  
+			  System.out.println(myRequest.toString());
+			  
+			  status = PICK_UP;
+			  
+		  } catch(Exception e) {
+			  e.printStackTrace();
+		  }
 	  }
 	  
 	  @Override

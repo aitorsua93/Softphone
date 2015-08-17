@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import app.softphone.core.cuentas.Cuenta;
+import app.softphone.core.preferencias.Configuracion;
+import app.softphone.core.preferencias.OperacionesPreferencias;
 import app.softphone.core.sip.OperacionesSip;
 
 
@@ -31,6 +33,7 @@ public class Principal implements ActionListener{
 	static final int WAIT_ACK=6;
 	int status;
 	Log l = new Log();
+	OperacionesPreferencias opPre = new OperacionesPreferencias();
 	RecibirLlamada rl = null;
 	
 	
@@ -166,13 +169,21 @@ public class Principal implements ActionListener{
 			public void actionPerformed(ActionEvent e) {
 				String destinatario = llamarField.getText();
 				if (!destinatario.equals("") && !(iniciarSesion.isEnabled())) {
-					opSip = is.getOpSip();
-					cuenta = is.getCuenta();
-					JPanel llamada = new Llamada(opSip,cuenta,destinatario,pestanas);
-					pestanas.addTab("Llamada",llamada);
-					pestanas.setSelectedIndex(3);
-					llamarField.setText("");
-					opSip.call(0, destinatario);
+					Configuracion conf = opPre.obtenerPreferencias();
+					String comparar = destinatario.substring(0, conf.getSecCaptura().length());
+					if (conf.getCapturaOpcion().equals("Si") && conf.getSecCaptura().equals(comparar)) {
+						String usuarioCaptura = destinatario.substring(conf.getSecCaptura().length(), destinatario.length());
+						//Funcion que haga la captura de llamadas
+						opSip.callTransfer(usuarioCaptura);
+					} else {
+						opSip = is.getOpSip();
+						cuenta = is.getCuenta();
+						JPanel llamada = new Llamada(opSip,cuenta,destinatario,pestanas);
+						pestanas.addTab("Llamada",llamada);
+						pestanas.setSelectedIndex(3);
+						llamarField.setText("");
+						opSip.call(0, destinatario);
+					}
 				}	
 			}
 		};
