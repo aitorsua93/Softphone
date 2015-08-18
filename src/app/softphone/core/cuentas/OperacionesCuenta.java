@@ -32,8 +32,8 @@ public class OperacionesCuenta {
 		Cuenta cuenta3 = new Cuenta("2222","192.168.1.102","456","Secretaria");
 		OperacionesCuenta op = new OperacionesCuenta();
 		op.crear(cuenta1);
-		/*//op.crear(cuenta2);
-		List<Cuenta> c = new ArrayList<Cuenta>();
+		op.crear(cuenta2);
+		/*List<Cuenta> c = new ArrayList<Cuenta>();
 		Cuenta b;
 		//op.borrar("Santi");
 		//op.crear(cuenta1);

@@ -31,11 +31,13 @@ public class Captura extends JPanel {
 		opciones.setLayout(new BoxLayout(opciones,BoxLayout.Y_AXIS));
 		opciones.add(Box.createRigidArea(new Dimension (30,20)));
 		opcionesLabel = new JLabel ("Opciones captura de llamadas");
+		opcionesLabel.setFont(new java.awt.Font("Bold", 1, 16));
 		opciones.add(opcionesLabel);
 		opciones.add(Box.createRigidArea(new Dimension (30,20)));
 		opciones.add(activarCaptura);
 		opciones.add(Box.createRigidArea(new Dimension (30,40)));
 		datosLabel = new JLabel("Datos captura de llamadas");
+		datosLabel.setFont(new java.awt.Font("Bold", 1, 16));
 		opciones.add(datosLabel);
 		opciones.add(Box.createRigidArea(new Dimension (30,20)));
 	}

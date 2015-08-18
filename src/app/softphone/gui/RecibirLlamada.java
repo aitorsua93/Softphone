@@ -56,11 +56,11 @@ public class RecibirLlamada extends JDialog implements ActionListener{
 		panelLabels = new JPanel();
 		panelLabels.setLayout(new BoxLayout(panelLabels, BoxLayout.Y_AXIS));
 		tituloLabel = new JLabel("Recibiendo llamada de:");
-		tituloLabel.setFont(new java.awt.Font("Calibri", 1, 20));
+		tituloLabel.setFont(new java.awt.Font("Bold", 1, 20));
 		usuarioLabel = new JLabel(usuario);
-		usuarioLabel.setFont(new java.awt.Font("Calibri", 1, 18));
+		usuarioLabel.setFont(new java.awt.Font("Bold", 1, 18));
 		sipLabel = new JLabel(sip);
-		sipLabel.setFont(new java.awt.Font("Calibri", 1, 18));
+		sipLabel.setFont(new java.awt.Font("Bold", 1, 18));
 		
 		panelLabels.add(Box.createRigidArea(new Dimension (10,10)));
 		panelLabels.add(tituloLabel);

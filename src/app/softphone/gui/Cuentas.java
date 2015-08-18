@@ -36,18 +36,18 @@ public class Cuentas extends JPanel {
  		panelDetalles = new JPanel();
  		if (c != null) {
 	 		nombreCuenta = new JLabel("Nombre de la cuenta: " + c.getNombre());
-	 		nombreCuenta.setFont(new java.awt.Font("Calibri", 1, 16));
+	 		nombreCuenta.setFont(new java.awt.Font("Bold", 1, 16));
 	 		usuarioCuenta = new JLabel("Usuario de la cuenta: " + c.getUsuario());
-	 		usuarioCuenta.setFont(new java.awt.Font("Calibri", 1, 16));
+	 		usuarioCuenta.setFont(new java.awt.Font("Bold", 1, 16));
 	 		servidorCuenta = new JLabel("Servidor de la cuenta: " + c.getServidor());
-	 		servidorCuenta.setFont(new java.awt.Font("Calibri", 1, 16));
+	 		servidorCuenta.setFont(new java.awt.Font("Bold", 1, 16));
  		} else {
 	 		nombreCuenta = new JLabel("No se ha iniciado sesion");
-	 		nombreCuenta.setFont(new java.awt.Font("Calibri", 1, 16));
+	 		nombreCuenta.setFont(new java.awt.Font("Bold", 1, 16));
 	 		usuarioCuenta = new JLabel("");
-	 		usuarioCuenta.setFont(new java.awt.Font("Calibri", 1, 16));
+	 		usuarioCuenta.setFont(new java.awt.Font("Bold", 1, 16));
 	 		servidorCuenta = new JLabel("");
-	 		servidorCuenta.setFont(new java.awt.Font("Calibri", 1, 16));
+	 		servidorCuenta.setFont(new java.awt.Font("Bold", 1, 16));
  		}
 		panelDetalles.setLayout(new BoxLayout(panelDetalles,BoxLayout.Y_AXIS));
 		panelDetalles.add(Box.createRigidArea(new Dimension (10,20)));

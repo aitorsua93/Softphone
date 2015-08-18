@@ -32,6 +32,7 @@ public class Desvio extends JPanel {
 		 opciones.setLayout(new BoxLayout(opciones,BoxLayout.Y_AXIS));
 		 opciones.add(Box.createRigidArea(new Dimension (30,20)));
 		 opDesvio = new JLabel("Opciones desvio");
+		 opDesvio.setFont(new java.awt.Font("Bold", 1, 16));
 		 opciones.add(opDesvio);
 		 opciones.add(Box.createRigidArea(new Dimension (30,20)));
 		 opciones.add(desvioSiempre);
@@ -39,6 +40,7 @@ public class Desvio extends JPanel {
 		 opciones.add(desvioTimeout);
 		 opciones.add(Box.createRigidArea(new Dimension (30,40)));
 		 datosDesvio = new JLabel("Datos desvio");
+		 datosDesvio.setFont(new java.awt.Font("Bold", 1, 16));
 		 opciones.add(datosDesvio);
 	 }
 

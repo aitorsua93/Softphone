@@ -174,7 +174,7 @@ public class Principal implements ActionListener{
 					if (conf.getCapturaOpcion().equals("Si") && conf.getSecCaptura().equals(comparar)) {
 						String usuarioCaptura = destinatario.substring(conf.getSecCaptura().length(), destinatario.length());
 						//Funcion que haga la captura de llamadas
-						opSip.callTransfer(usuarioCaptura);
+						opSip.callPickUp(usuarioCaptura);
 					} else {
 						opSip = is.getOpSip();
 						cuenta = is.getCuenta();

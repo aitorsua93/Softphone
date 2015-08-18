@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 
 
 
+
 import org.apache.log4j.Logger;
 
 import app.softphone.core.cuentas.Cuenta;
@@ -77,6 +78,7 @@ public class OperacionesSip  implements SipListener {
 	  static Logger log = Logger.getLogger("softphone");
 	  OperacionesPreferencias opPre = new OperacionesPreferencias();
 	  private SecureRandom random = new SecureRandom();
+	  
 	  
 	  public OperacionesSip(String myIp, Cuenta c) {
 		  this.myIp = myIp;
@@ -255,7 +257,6 @@ public class OperacionesSip  implements SipListener {
 			  		
 			  	case ESTABLISHED:
 			  		if (type == NO) {
-			  			System.out.println("Entro para enviar el BYE");
 			  			Request myBye = myDialog.createRequest("BYE");
 			  			String uri = ((ToHeader)myBye.getHeader("To")).getAddress().getURI().toString();
 		        		URI requestBye = address.createURI(uri + ":" + asteriskPort);
@@ -313,7 +314,7 @@ public class OperacionesSip  implements SipListener {
 		  
 	  }
 	  
-	  public void callTransfer(String destination) {
+	  public void callPickUp(String destination) {
 		  try {
 			  SipURI dest = address.createSipURI(destination, asteriskIp);
 			  Address toAddress = address.createAddress(dest);
@@ -426,7 +427,6 @@ public class OperacionesSip  implements SipListener {
 				  
 			  	case ESTABLISHED:
 			  		if (method.equals("BYE")) {
-			  			System.out.println("Entro en el BYE");
 			  			Response myResponse = message.createResponse(200, myRequest);
 			  			myResponse.addHeader(contactHeader);
 			  			myServerTransaction.sendResponse(myResponse);
@@ -646,6 +646,7 @@ public class OperacionesSip  implements SipListener {
 	              }
 	        public void run() {
 	          try{
+	        	  if (status == RINGING) {
 	  				Response myResponseMoved = message.createResponse(302, request);
 	  				
 	  				ToHeader toHeaderMoved = (ToHeader) myResponseMoved.getHeader("To");
@@ -661,6 +662,7 @@ public class OperacionesSip  implements SipListener {
 	  				log.info("Sent MOVED TEMPORARILY response:\n" + myResponseMoved.toString());
 	  				
 	  				status = IDLE;
+	        	  }
 	          }catch (Exception ex){
 	            ex.printStackTrace();
 	        }

@@ -37,7 +37,7 @@ public class Llamada extends JPanel implements ActionListener{
 		this.opSip = opSip;
 		this.pestanas = pestanas;
 		cronometro = new JLabel("00:00:00");
-		cronometro.setFont(new java.awt.Font("Calibri", 1, 15));
+		cronometro.setFont(new java.awt.Font("Bold", 1, 15));
 		Cronometro cron = new Cronometro(cronometro);
 		crearLabels(destinatario,cuenta,cronometro);
 		crearBotonesLlam(pestanas, opSip);
@@ -66,11 +66,11 @@ public class Llamada extends JPanel implements ActionListener{
 		panelLabels = new JPanel();
 		panelLabels.setLayout(new BoxLayout(panelLabels, BoxLayout.Y_AXIS));
 		destLabel = new JLabel(destinatario);
-		destLabel.setFont(new java.awt.Font("Calibri", 1, 20));
+		destLabel.setFont(new java.awt.Font("Bold", 1, 20));
 		destCompLabel = new JLabel(c.getUsuario() + "@" + c.getServidor());
-		destCompLabel.setFont(new java.awt.Font("Calibri", 1, 15));
+		destCompLabel.setFont(new java.awt.Font("Bold", 1, 15));
 		statusLabel = new JLabel("Llamando...");
-		statusLabel.setFont(new java.awt.Font("Calibri", 1, 15));
+		statusLabel.setFont(new java.awt.Font("Bold", 1, 15));
 		
 		panelLabels.add(Box.createRigidArea(new Dimension (10,10)));
 		panelLabels.add(destLabel);
@@ -92,7 +92,6 @@ public class Llamada extends JPanel implements ActionListener{
 		ActionListener colgarListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(opSip.getStatus());
 				opSip.call(1, null);
 				pestanas.remove(3);
 			}
