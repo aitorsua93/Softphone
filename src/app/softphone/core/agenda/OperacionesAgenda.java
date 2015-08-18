@@ -22,14 +22,23 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import app.softphone.core.cuentas.Cuenta;
-import app.softphone.core.cuentas.EstadoCuenta.Estado;
-
 
 public class OperacionesAgenda {
 	
 	public static void main(String[] args) {
 		OperacionesAgenda opAgenda = new OperacionesAgenda();
+		List<Contacto> lc = new ArrayList<Contacto>();
+		
+		lc = opAgenda.buscarCuentas();
+		Collections.sort(lc, new DepartamentoContactoComparator());
+		
+		for(int i=0;i<lc.size();i++) {
+			System.out.println(lc.get(i).getNombre());
+			System.out.println(lc.get(i).getApellido());
+			System.out.println(lc.get(i).getNumero());
+			System.out.println(lc.get(i).getDepartamento() + "\n");
+		}
+		
 		/*Contacto c1 = new Contacto("Pepe","Rodriguez","8002","Direccion");
 		Contacto c2 = new Contacto("Manuel","Diaz","8003","Administracion");
 		
@@ -64,9 +73,9 @@ public class OperacionesAgenda {
 			System.out.println(lc.get(i).getApellido());
 			System.out.println(lc.get(i).getNumero());
 			System.out.println(lc.get(i).getDepartamento() + "\n");
-		}*/
+		}
 		
-		opAgenda.borrar("Pepe", "Rodriguez");
+		opAgenda.borrar("Pepe", "Rodriguez");*/
 		
 	}
 	
@@ -135,7 +144,7 @@ public class OperacionesAgenda {
 		return nValor.getNodeValue();
 	}
 	
-	public List<Contacto> buscarCuentas(String ord) {
+	public List<Contacto> buscarCuentas() {
 		List<Contacto> agenda = new ArrayList<Contacto>();
 		
 		try {
@@ -170,14 +179,6 @@ public class OperacionesAgenda {
 			System.out.println(saxE.getMessage());
 		} catch(IOException ioE) {
 			System.out.println(ioE.getMessage());
-		}
-		
-		if (ord.equals("nombre")) {
-			Collections.sort(agenda, new NombreContactoComparator());
-		} else if (ord.equals("apellido")) {
-			Collections.sort(agenda, new ApellidoContactoComparator());
-		} else if (ord.equals("departamento")) {
-			Collections.sort(agenda, new DepartamentoContactoComparator());
 		}
 		
 		return agenda;
@@ -222,7 +223,7 @@ public class OperacionesAgenda {
 		return objContacto;
 	}
 	
-	public void actualizar(Contacto contactoAct, String nombre, String apellido) {
+	public void actualizar(Contacto contactoAct, Contacto c) {
 		try {
 			//clases necesarias para leer XML
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -240,7 +241,9 @@ public class OperacionesAgenda {
 					Element unElemento = (Element) contacto;
 					String n = obtenerNodoValor("nombre",unElemento);
 					String a = obtenerNodoValor("apellido",unElemento);
-					if (n.equals(nombre) && a.equals(apellido)) {
+					String num = obtenerNodoValor("numero",unElemento);
+					String d = obtenerNodoValor("departamento",unElemento);
+					if (n.equals(c.getNombre()) && a.equals(c.getApellido()) && num.equals(c.getNumero()) && d.equals(c.getDepartamento())) {
 						//agregamos una nueva etiqueta al documento
 						Element nuevoContacto = doc.createElement("contacto");
 						//agregamos etiquetas hijas
@@ -285,7 +288,7 @@ public class OperacionesAgenda {
 		}
 	}
 	
-	public void borrar(String nombre, String apellido) {
+	public void borrar(Contacto c) {
 		try {
 			//clases necesarias para leer XML
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -303,7 +306,9 @@ public class OperacionesAgenda {
 					Element unElemento = (Element) contacto;
 					String n = obtenerNodoValor("nombre",unElemento);
 					String a = obtenerNodoValor("apellido",unElemento);
-					if (n.equals(nombre) && a.equals(apellido)) {
+					String num = obtenerNodoValor("numero",unElemento);
+					String d = obtenerNodoValor("departamento",unElemento);
+					if (n.equals(c.getNombre()) && a.equals(c.getApellido()) && num.equals(c.getNumero()) && d.equals(c.getDepartamento())) {
 						unElemento.getParentNode().removeChild(unElemento);
 					};
 				}

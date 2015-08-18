@@ -192,7 +192,7 @@ public class Principal implements ActionListener{
 	
 	public void crearPestanas() {
 		pestanas = new JTabbedPane();
-		JPanel agenda = new JPanel();
+		JPanel agenda = new Agenda(llamarField);
 		JPanel historico = new JPanel();
 		JPanel dialpad = new Dialpad(llamarField);
 		pestanas.addTab("Agenda", agenda);
@@ -204,7 +204,7 @@ public class Principal implements ActionListener{
 	public void crearVentana() {
 		ventana = new JFrame();
 		ventana.setTitle("Softphone");
-		ventana.setSize(350,450);
+		ventana.setSize(370,460);
 		ventana.setJMenuBar(menuPrin);
 		ventana.add(zonaLlamar, BorderLayout.NORTH); // Colocar la zona de llamar en la zona de arriba de la ventana
 		ventana.add(pestanas, BorderLayout.CENTER); // Colocar las pesta�as en centro de la ventana
