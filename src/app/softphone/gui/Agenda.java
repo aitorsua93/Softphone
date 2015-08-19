@@ -21,6 +21,7 @@ import javax.swing.event.ListSelectionListener;
 
 import app.softphone.core.agenda.Contacto;
 import app.softphone.core.agenda.OperacionesAgenda;
+import app.softphone.core.preferencias.OperacionesPreferencias;
 
 @SuppressWarnings("serial")
 public class Agenda extends JPanel {
@@ -32,6 +33,7 @@ public class Agenda extends JPanel {
 	JButton anadirCont, eliminarCont, editarCont;
 	JComboBox<String> filtro;
 	OperacionesAgenda opAgenda = new OperacionesAgenda();
+	OperacionesPreferencias opPre = new OperacionesPreferencias();
 	
 	public Agenda(JTextField llamar) {
 		crearPanelLista();
@@ -128,7 +130,6 @@ public class Agenda extends JPanel {
 			    	llamar.setText(listModel.getContacto(listaContactos.getSelectedIndex()).getNumero());
 			    }
 			}
-
 		};
 		listaContactos.addListSelectionListener(listaListener);
 		

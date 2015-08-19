@@ -56,18 +56,23 @@ public class Principal implements ActionListener{
 		if (!(iniciarSesion.isEnabled())) {
 			  opSip = is.getOpSip();
 			  status = opSip.getStatus();
+			  System.out.println(status);
+			  
 			  switch(status) {
 			  	case IDLE:
 			  		if (pestanas.getTabCount() == 4) {
 			  			pestanas.remove(3);
 			  		}
+			  		rl = null;
 			  		break;
 			  	case RINGING:
 			  		sipLlam = opSip.getSipLlam();
 			  		usuarioLlam = opSip.getUsuarioLlam();
 			  		Cuenta c = is.getCuenta();
-			  		rl = new RecibirLlamada(usuarioLlam,sipLlam,opSip,c,pestanas);
-			  		rl.setVisible(true);
+			  		if (rl == null) {
+				  		rl = new RecibirLlamada(usuarioLlam,sipLlam,opSip,c,pestanas);
+				  		rl.setVisible(true);
+			  		}
 			  		break;
 			  }
 		  }

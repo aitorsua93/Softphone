@@ -60,7 +60,7 @@ public class OperacionesSip  implements SipListener {
 	  long seq = 1;
 	  int asteriskPort = 5060;
 	  Cuenta cuentaGlob;
-	  int status;
+	  int status, status2;
 	  boolean registro;
 	  
 	  static final int YES=0;
@@ -152,6 +152,10 @@ public class OperacionesSip  implements SipListener {
 		  
 	  public int getStatus() {
 		  return this.status;
+	  }
+	  
+	  public int getStatus2() {
+		  return this.status2;
 	  }
 	  
 	  public boolean getRegistro() {
@@ -454,6 +458,7 @@ public class OperacionesSip  implements SipListener {
 			  			byte[] content = mySdpManager.createSdp(answerInfo);
 			  			myResponse.setContent(content, contentTypeHeader);
 			  			
+			  			//Hay que parar el anterior media
 			  			//myVoiceTool.startMedia(offerInfo.getIpAddress(),offerInfo.getAPort(),answerInfo.getAPort(),offerInfo.getAFormat(),myIp);
 			  			
 			  			myServerTransaction.sendResponse(myResponse);
@@ -461,7 +466,7 @@ public class OperacionesSip  implements SipListener {
 			  			
 			  			log.info("Send Response:\n" + myResponse.toString());
 			  			
-			  			status = WAIT_ACK;
+			  			status = ESTABLISHED;
 			  		}
 			  		break;
 			  		

@@ -37,7 +37,7 @@ public class RecibirLlamada extends JDialog implements ActionListener{
 		add(panelBotones, BorderLayout.SOUTH);
 		setTitle("Recibiendo llamada...");
 		setSize(400,200);
-		setModal(true);
+		//setModal(true);
 		setLocationRelativeTo(null);
 		setResizable(false);
 		Timer timer = new Timer(100,this);
@@ -47,6 +47,7 @@ public class RecibirLlamada extends JDialog implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		status = opSip.getStatus();
+		//System.out.println(status);
 		if (status == IDLE) {
 			dispose();
 		}
