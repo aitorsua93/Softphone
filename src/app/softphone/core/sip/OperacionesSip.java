@@ -14,8 +14,14 @@ import javax.swing.JOptionPane;
 
 
 
+
+
+
+
 import org.apache.log4j.Logger;
 
+import app.softphone.core.agenda.Contacto;
+import app.softphone.core.agenda.OperacionesAgenda;
 import app.softphone.core.cuentas.Cuenta;
 import app.softphone.core.preferencias.Configuracion;
 import app.softphone.core.preferencias.OperacionesPreferencias;
@@ -24,6 +30,7 @@ import app.softphone.core.rtp.VoiceTool;
 import app.softphone.core.sdp.SdpInfo;
 import app.softphone.core.sdp.SdpManager;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
@@ -45,8 +52,7 @@ public class OperacionesSip  implements SipListener {
 	  SdpInfo offerInfo;
 	  SdpInfo answerInfo;
 	  VoiceTool myVoiceTool;
-	  TonesTool myAlertTool;
-	  TonesTool myRingTool;
+	  TonesTool myAlertTool, myRingTool, myBusyTool;
 	  String sipId;
 	  String myIp;
 	  String sipLlam;
@@ -77,6 +83,7 @@ public class OperacionesSip  implements SipListener {
 
 	  static Logger log = Logger.getLogger("softphone");
 	  OperacionesPreferencias opPre = new OperacionesPreferencias();
+	  OperacionesAgenda opAgenda = new OperacionesAgenda();
 	  private SecureRandom random = new SecureRandom();
 	  
 	  
@@ -93,9 +100,20 @@ public class OperacionesSip  implements SipListener {
 		      
 		      myAlertTool=new TonesTool();
 		      myRingTool=new TonesTool();
+		      myBusyTool=new TonesTool();
 		      
-		      //myAlertTool.prepareTone("file://c:\\alert.wav");
-		      //myRingTool.prepareTone("file://c:\\ring.wav");
+		      String toneRing = "file://" + new File("resources/ring 4.wav").getAbsolutePath();
+		      String toneBusy = "file://" + new File("resources/ocupado.wav").getAbsolutePath();
+		      
+		      TimerTask tonesTask = new TimerTask() { 
+			         public void run() { 
+			        	 myRingTool.prepareTone(toneRing);
+			        	 myBusyTool.prepareTone(toneBusy);
+			        	//myAlertTool.prepareTone("file://c:\\alert.wav");
+			         } 
+			     }; 
+			  Timer timerT = new Timer();
+			  timerT.schedule(tonesTask, 6000);
 		      
 			  SipFactory sipFactory = SipFactory.getInstance();
 			  sipFactory.setPathName("gov.nist");
@@ -129,8 +147,8 @@ public class OperacionesSip  implements SipListener {
 						} 
 			         } 
 			     }; 
-			  Timer timer = new Timer();
-			  timer.scheduleAtFixedRate(registerTask, 0, 500000);
+			  Timer timerR = new Timer();
+			  timerR.scheduleAtFixedRate(registerTask, 0, 500000);
 		  } catch(Exception e) {
 			  log.error(e.getMessage());
 		  }
@@ -285,7 +303,7 @@ public class OperacionesSip  implements SipListener {
 			  			
 			  			log.info("Send BUSY response:\n" + myResponse.toString());
 			  			
-			  			//myAlertTool.stopTone();
+			  			myRingTool.stopTone();
 			  			break;
 			  		} else if (type == YES) {
 			  			Request originalRequest = myServerTransaction.getRequest();
@@ -294,7 +312,7 @@ public class OperacionesSip  implements SipListener {
 			  			myToHeader.setTag(tag);
 			  			myResponse.addHeader(contactHeader);
 			  			
-			  			//myAlertTool.stopTone();
+			  			myRingTool.stopTone();
 			  			
 			  			ContentTypeHeader contentTypeHeader = header.createContentTypeHeader("application", "sdp");
 			  			byte[] content = mySdpManager.createSdp(answerInfo);
@@ -373,9 +391,16 @@ public class OperacionesSip  implements SipListener {
 			  			}
 			  			
 			  			ContactHeader ch = (ContactHeader) myRequest.getHeader("Contact");
-			  			usuarioLlam = ch.getName().toString();
 			  			sipLlam = ch.getAddress().toString();
-			  			//myAlertTool.playTone();
+			  			sipLlam = sipLlam.substring(5, sipLlam.length()-1);
+			  			String[] user = sipLlam.split("@");
+			  			usuarioLlam = user[0];
+			  			Contacto c = opAgenda.buscarContactoNumero(user[0]);
+			  			if (c.getNumero() != null) {
+			  				usuarioLlam = c.getApellido() + ", " + c.getNombre();
+			  				sipLlam = c.getDepartamento();
+			  			}
+			  			myRingTool.playTone();
 			  			
 			  			byte[] cont = (byte[]) myRequest.getContent();
 			  			offerInfo = mySdpManager.getSdp(cont);
@@ -480,7 +505,7 @@ public class OperacionesSip  implements SipListener {
 			  			Response myCancelResponse = message.createResponse(200, myRequest);
 			  			myCancelServerTransaction.sendResponse(myCancelResponse);
 			  			
-			  			//myAlertTool.stopTone();
+			  			myRingTool.stopTone();
 			  			
 			  			log.info("Send Response:\n" + myResponse.toString());
 			  			log.info("Send Response:\n"+ myCancelResponse.toString());
@@ -604,7 +629,9 @@ public class OperacionesSip  implements SipListener {
 			        		log.info("Llamada establecida\n\n");
 			        	} else {
 			        		status = IDLE;
-			        		JOptionPane.showMessageDialog(null, myStatusCode + " " + myResponse.getReasonPhrase(),"Informacion", JOptionPane.INFORMATION_MESSAGE);
+			        		myBusyTool.playTone();
+			        		Thread.sleep(2000);
+			        		myBusyTool.stopTone();
 			        		//myRingTool.stopTone();
 			        		
 			        	}
@@ -665,6 +692,8 @@ public class OperacionesSip  implements SipListener {
 	  				myDialog = myServerTransaction.getDialog();
 	  				
 	  				log.info("Sent MOVED TEMPORARILY response:\n" + myResponseMoved.toString());
+	  				
+	  				myRingTool.stopTone();
 	  				
 	  				status = IDLE;
 	        	  }

@@ -23,13 +23,14 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 
+
 public class OperacionesAgenda {
 	
 	public static void main(String[] args) {
 		OperacionesAgenda opAgenda = new OperacionesAgenda();
 		List<Contacto> lc = new ArrayList<Contacto>();
 		
-		lc = opAgenda.buscarCuentas();
+		lc = opAgenda.buscarContactos();
 		Collections.sort(lc, new DepartamentoContactoComparator());
 		
 		for(int i=0;i<lc.size();i++) {
@@ -37,6 +38,15 @@ public class OperacionesAgenda {
 			System.out.println(lc.get(i).getApellido());
 			System.out.println(lc.get(i).getNumero());
 			System.out.println(lc.get(i).getDepartamento() + "\n");
+		}
+		
+		Contacto c = opAgenda.buscarContactoNumero("8001");
+	
+		if (c.getNumero()!=null) {
+		System.out.println(c.getNombre());
+		System.out.println(c.getApellido());
+		System.out.println(c.getNumero());
+		System.out.println(c.getDepartamento() + "\n");
 		}
 		
 		/*Contacto c1 = new Contacto("Pepe","Rodriguez","8002","Direccion");
@@ -144,7 +154,7 @@ public class OperacionesAgenda {
 		return nValor.getNodeValue();
 	}
 	
-	public List<Contacto> buscarCuentas() {
+	public List<Contacto> buscarContactos() {
 		List<Contacto> agenda = new ArrayList<Contacto>();
 		
 		try {
@@ -204,6 +214,44 @@ public class OperacionesAgenda {
 					String n = obtenerNodoValor("nombre",unElemento);
 					String a = obtenerNodoValor("apellido",unElemento);
 					if (n.equals(nombre) && a.equals(apellido)) {
+						objContacto.setNombre(obtenerNodoValor("nombre",unElemento));
+						objContacto.setApellido(obtenerNodoValor("apellido",unElemento));
+						objContacto.setNumero(obtenerNodoValor("numero",unElemento));
+						objContacto.setDepartamento(obtenerNodoValor("departamento",unElemento));
+					}
+				}
+			}
+			
+		} catch(ParserConfigurationException parseE) {
+			System.out.println(parseE.getMessage());
+		} catch(SAXException saxE) {
+			System.out.println(saxE.getMessage());
+		} catch(IOException ioE) {
+			System.out.println(ioE.getMessage());
+		} 
+		
+		return objContacto;
+	}
+	
+	public Contacto buscarContactoNumero(String numero) {
+		Contacto objContacto = new Contacto();
+		try {
+			//clases necesarias para leer XML
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(new File("xmlsrc/agenda.xml"));
+			
+			//preparamos el archivo XML para leer los datos
+			doc.getDocumentElement().normalize();
+			//obtenemos todos los nodos de la etiqueta "cuentas"
+			NodeList nodosContacto = doc.getElementsByTagName("contacto");
+			//por cada nodo se obtienen los datosy se guardan en un objeto
+			for (int i=0;i<nodosContacto.getLength();i++) {
+				Node contacto = nodosContacto.item(i);
+				if (contacto.getNodeType() == Node.ELEMENT_NODE) {
+					Element unElemento = (Element) contacto;
+					String n = obtenerNodoValor("numero",unElemento);
+					if (n.equals(numero)) {
 						objContacto.setNombre(obtenerNodoValor("nombre",unElemento));
 						objContacto.setApellido(obtenerNodoValor("apellido",unElemento));
 						objContacto.setNumero(obtenerNodoValor("numero",unElemento));

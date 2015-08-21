@@ -47,7 +47,7 @@ public class Agenda extends JPanel {
 		listModel = new AgendaListModel();
 		panelLista = new JPanel();
 		listaContactos = new JList<Contacto>(listModel);
-		lc = opAgenda.buscarCuentas();
+		lc = opAgenda.buscarContactos();
 		for (int i=0;i<lc.size();i++) {
 			listModel.addContacto(lc.get(i));
 		}

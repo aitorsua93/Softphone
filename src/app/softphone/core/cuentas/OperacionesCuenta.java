@@ -158,7 +158,7 @@ public class OperacionesCuenta {
 		return listaCuentas;
 	}
 	
-	public Cuenta buscarCuenta(String nombre) {
+	public Cuenta buscarPorNumero(String nombre) {
 		Cuenta objCuenta = new Cuenta();
 		try {
 			//clases necesarias para leer XML

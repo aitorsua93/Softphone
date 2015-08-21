@@ -128,8 +128,8 @@ public class IniciarSesion extends JDialog {
 				String ip = elegirInt.getSelectedItem().toString();
 				String[] ipA = ip.split("\\s+");
 				String ipEleg = ipA[1];
-				opSip = new OperacionesSip(ipEleg,cuenta);
 				Progreso p = new Progreso();
+				opSip = new OperacionesSip(ipEleg,cuenta);
 				p.setLocationRelativeTo(panelDatos);
 				p.setVisible(true);
 				if (opSip.getRegistro()) {
