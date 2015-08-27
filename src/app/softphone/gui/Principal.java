@@ -56,7 +56,7 @@ public class Principal implements ActionListener{
 		if (!(iniciarSesion.isEnabled())) {
 			  opSip = is.getOpSip();
 			  status = opSip.getStatus();
-			  System.out.println(status);
+			  //System.out.println(status);
 			  
 			  switch(status) {
 			  	case IDLE:

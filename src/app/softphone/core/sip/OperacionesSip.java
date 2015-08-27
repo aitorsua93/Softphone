@@ -288,7 +288,7 @@ public class OperacionesSip  implements SipListener {
 			  			myDialog.sendRequest(myClientTransaction);
 			  			log.info("Send BYE request:\n" + myBye.toString());
 			  			
-			  			//myVoiceTool.stopMedia();
+			  			myVoiceTool.stopMedia();
 			  			
 			  			status = IDLE;
 			  		}
@@ -318,7 +318,7 @@ public class OperacionesSip  implements SipListener {
 			  			byte[] content = mySdpManager.createSdp(answerInfo);
 			  			myResponse.setContent(content, contentTypeHeader);
 			  			
-			  			//myVoiceTool.startMedia(offerInfo.getIpAddress(), offerInfo.getAPort(), answerInfo.getAPort(), offerInfo.getAFormat(), myIp);
+			  			myVoiceTool.startMedia(offerInfo.getIpAddress(), offerInfo.getAPort(), answerInfo.getAPort(), offerInfo.getAFormat(), myIp);
 			  			
 			  			myServerTransaction.sendResponse(myResponse);
 			  			myDialog = myServerTransaction.getDialog();
@@ -458,12 +458,12 @@ public class OperacionesSip  implements SipListener {
 			  		if (method.equals("BYE")) {
 			  			Response myResponse = message.createResponse(200, myRequest);
 			  			myResponse.addHeader(contactHeader);
+			  			status = IDLE;
 			  			myServerTransaction.sendResponse(myResponse);
 			  			log.info("Send response:\n" + myResponse.toString());
 			  			
-			  			//myVoiceTool.stopMedia();
+			  			myVoiceTool.stopMedia();
 			  			
-			  			status = IDLE;
 			  		} else if(method.equals("INVITE")){
 			  			if (myServerTransaction == null) {
 			  				myServerTransaction = udp.getNewServerTransaction(myRequest);
@@ -484,7 +484,8 @@ public class OperacionesSip  implements SipListener {
 			  			myResponse.setContent(content, contentTypeHeader);
 			  			
 			  			//Hay que parar el anterior media
-			  			//myVoiceTool.startMedia(offerInfo.getIpAddress(),offerInfo.getAPort(),answerInfo.getAPort(),offerInfo.getAFormat(),myIp);
+			  			myVoiceTool.stopMedia();
+			  			myVoiceTool.startMedia(offerInfo.getIpAddress(),offerInfo.getAPort(),answerInfo.getAPort(),offerInfo.getAFormat(),myIp);
 			  			
 			  			myServerTransaction.sendResponse(myResponse);
 			  			myDialog = myServerTransaction.getDialog();
@@ -590,7 +591,7 @@ public class OperacionesSip  implements SipListener {
 			        		byte[] cont = (byte[]) myResponse.getContent();
 			        		answerInfo = mySdpManager.getSdp(cont);
 			        		
-			        		//myVoiceTool.startMedia(answerInfo.getIpAddress(), answerInfo.getAPort(), offerInfo.getAPort(),answerInfo.getAFormat(), myIp);
+			        		myVoiceTool.startMedia(answerInfo.getIpAddress(), answerInfo.getAPort(), offerInfo.getAPort(),answerInfo.getAFormat(), myIp);
 			        		
 			        	} else {
 			        		status = IDLE;
@@ -625,7 +626,7 @@ public class OperacionesSip  implements SipListener {
 			        		byte[] cont = (byte[]) myResponse.getContent();
 			        		answerInfo = mySdpManager.getSdp(cont);
 			        			
-			        		//myVoiceTool.startMedia(answerInfo.getIpAddress(), answerInfo.getAPort(), offerInfo.getAPort(), answerInfo.getAFormat(), myIp);
+			        		myVoiceTool.startMedia(answerInfo.getIpAddress(), answerInfo.getAPort(), offerInfo.getAPort(), answerInfo.getAFormat(), myIp);
 			        		log.info("Llamada establecida\n\n");
 			        	} else {
 			        		status = IDLE;
