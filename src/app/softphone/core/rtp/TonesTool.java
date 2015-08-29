@@ -21,7 +21,7 @@ public class TonesTool implements ControllerListener {
 	
 	public static void main(String[] args) {
 		TonesTool t = new TonesTool();
-		String tone = "file://" + new File("resources/ring 4.wav").getAbsolutePath();
+		String tone = "file://" + new File("resources/ocupado.wav").getAbsolutePath();
 		t.prepareTone(tone);
 		t.playTone();
 	}

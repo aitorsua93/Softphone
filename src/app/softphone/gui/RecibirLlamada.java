@@ -84,8 +84,8 @@ public class RecibirLlamada extends JDialog implements ActionListener{
 				JPanel llamada = new Llamada(opSip,cuenta,sip,pestanas);
 				pestanas.addTab("Llamada",llamada);
 				pestanas.setSelectedIndex(3);
-				opSip.call(0, sip);
 				dispose();
+				opSip.call(0, sip);
 			}
 		};
 		respBut.addActionListener(respListener);

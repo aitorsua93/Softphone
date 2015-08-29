@@ -464,7 +464,7 @@ public class OperacionesSip  implements SipListener {
 			  			
 			  			myVoiceTool.stopMedia();
 			  			
-			  		} else if(method.equals("INVITE")){
+			  		}/* else if(method.equals("INVITE")){
 			  			if (myServerTransaction == null) {
 			  				myServerTransaction = udp.getNewServerTransaction(myRequest);
 			  			}
@@ -493,7 +493,7 @@ public class OperacionesSip  implements SipListener {
 			  			log.info("Send Response:\n" + myResponse.toString());
 			  			
 			  			status = ESTABLISHED;
-			  		}
+			  		}*/
 			  		break;
 			  		
 			  
@@ -591,7 +591,7 @@ public class OperacionesSip  implements SipListener {
 			        		byte[] cont = (byte[]) myResponse.getContent();
 			        		answerInfo = mySdpManager.getSdp(cont);
 			        		
-			        		myVoiceTool.startMedia(answerInfo.getIpAddress(), answerInfo.getAPort(), offerInfo.getAPort(),answerInfo.getAFormat(), myIp);
+			        		//myVoiceTool.startMedia(answerInfo.getIpAddress(), answerInfo.getAPort(), offerInfo.getAPort(),answerInfo.getAFormat(), myIp);
 			        		
 			        	} else {
 			        		status = IDLE;

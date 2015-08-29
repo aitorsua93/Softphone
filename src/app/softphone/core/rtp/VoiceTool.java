@@ -5,8 +5,8 @@ import java.util.Vector;
 
 import javax.media.CaptureDeviceInfo;
 import javax.media.CaptureDeviceManager;
+import javax.media.Codec;
 import javax.media.Manager;
-import javax.media.MediaLocator;
 import javax.media.Player;
 import javax.media.Processor;
 import javax.media.control.TrackControl;
@@ -20,6 +20,9 @@ import javax.media.rtp.SessionAddress;
 import javax.media.rtp.event.NewReceiveStreamEvent;
 import javax.media.rtp.event.ReceiveStreamEvent;
 
+import com.ibm.media.codec.audio.gsm.JavaEncoder;
+import com.ibm.media.codec.audio.gsm.Packetizer;
+import com.ibm.media.codec.audio.rc.RCModule;
 import com.sun.media.rtp.RTPSessionMgr;
 
 public class VoiceTool implements ReceiveStreamListener {
@@ -31,40 +34,6 @@ public class VoiceTool implements ReceiveStreamListener {
 	private Player player = null;
 	private AudioFormat af = null;
 	
-	
-	public static void main(String[] args) {
-		try {
-			AudioFormat df = new AudioFormat(AudioFormat.LINEAR,8000,16,1);
-			Vector devices = CaptureDeviceManager.getDeviceList(df);
-			CaptureDeviceInfo di = (CaptureDeviceInfo) devices.elementAt(0);
-			for (int i=0;i<devices.size();i++) {
-				System.out.println(devices.elementAt(i));
-			}
-			//MediaLocator ml = new MediaLocator("javasound://44100");
-			DataSource daso = Manager.createDataSource(di.getLocator());
-			Processor myProcessor = Manager.createProcessor(daso);
-			myProcessor.configure();
-			while (myProcessor.getState() != Processor.Configured) {
-				Thread.sleep(10);
-			}
-			myProcessor.setContentDescriptor(new ContentDescriptor(ContentDescriptor.RAW_RTP));
-			TrackControl track[] = myProcessor.getTrackControls();
-			AudioFormat af = new AudioFormat(AudioFormat.GSM_RTP,8000,16,1);
-			track[0].setFormat(af);
-			myProcessor.realize();
-			while(myProcessor.getState() != Processor.Realized) {}
-			DataSource ds = myProcessor.getDataOutput();
-			
-			RTPSessionMgr myVoiceSessionManager = new RTPSessionMgr();
-			
-			//myVoiceSessionManager.addReceiveStreamListener(this);
-			
-			//SessionAddress senderAddr = new SessionAddress();
-			//myVoiceSessionManager.initSession(senderAddr, null, 0.05, 0.25);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
 	
 	public void startMedia(String peerIP, int peerPort, int recvPort, int fmt, String myIP) {
 		
@@ -87,6 +56,13 @@ public class VoiceTool implements ReceiveStreamListener {
 			af = new AudioFormat(AudioFormat.GSM_RTP,8000,16,1);
 			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
 			track[0].setFormat(af);
+			RCModule rcm = new RCModule();
+			JavaEncoder je = new JavaEncoder();
+			Packetizer p = new Packetizer();
+			//Para cambiar el tamaño del paquete RTP
+			p.setPacketSize(33);
+			Codec[] c = {rcm,je,p};
+			track[0].setCodecChain(c);
 			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
 			myProcessor.realize();
 			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
@@ -97,7 +73,6 @@ public class VoiceTool implements ReceiveStreamListener {
 			DataSource ds = myProcessor.getDataOutput();
 			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
 			myVoiceSessionManager = new RTPSessionMgr();
-			
 			myVoiceSessionManager.addReceiveStreamListener(this);
 			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
 			SessionAddress senderAddr = new SessionAddress();

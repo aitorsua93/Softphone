@@ -94,7 +94,7 @@ public class IniciarSesion extends JDialog {
 		servidorText = new JTextField();
 		panelDatos.add(servidorText);
 		
-		passwordLabel = new JLabel("ContraseÃ±a:");
+		passwordLabel = new JLabel("Contraseña:");
 		panelDatos.add(passwordLabel);
 		passwordText = new JPasswordField();
 		panelDatos.add(passwordText);
