@@ -69,6 +69,7 @@ public class VoiceTool implements ReceiveStreamListener {
 			while(myProcessor.getState() != Processor.Realized) {
 				System.out.println("Bucleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
 			}
+			System.out.println(track.toString());
 			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
 			DataSource ds = myProcessor.getDataOutput();
 			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
@@ -82,6 +83,7 @@ public class VoiceTool implements ReceiveStreamListener {
 			SessionAddress localAddr = new SessionAddress(InetAddress.getByName(myIP), recvPort, InetAddress.getByName(myIP), recvPort+1);
 			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
 			SessionAddress remoteAddr = new SessionAddress(destAddr, peerPort, destAddr, peerPort+1);
+			//Metodo que provoca el delay de 5 seg
 			myVoiceSessionManager.startSession(localAddr, localAddr, remoteAddr, null);
 			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
 			ss = myVoiceSessionManager.createSendStream(ds, 0);
