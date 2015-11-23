@@ -7,16 +7,6 @@ import javax.sip.*;
 import javax.sip.address.*;
 import javax.sip.header.*;
 import javax.sip.message.*;
-import javax.swing.JOptionPane;
-
-
-
-
-
-
-
-
-
 
 import org.apache.log4j.Logger;
 
@@ -102,8 +92,9 @@ public class OperacionesSip  implements SipListener {
 		      myRingTool=new TonesTool();
 		      myBusyTool=new TonesTool();
 		      
-		      String toneRing = "file://" + new File("resources/ring 4.wav").getAbsolutePath();
-		      String toneBusy = "file://" + new File("resources/ocupado.wav").getAbsolutePath();
+		      //Provisional, arreglarlo.
+		      String toneRing = "file://" + new File("C:/Users/Aitor/Desktop/Tonos/ring 4.wav").getAbsolutePath();
+		      String toneBusy = "file://" + new File("C:/Users/Aitor/Desktop/Tonos/ocupado.wav").getAbsolutePath();
 		      
 		      TimerTask tonesTask = new TimerTask() { 
 			         public void run() { 

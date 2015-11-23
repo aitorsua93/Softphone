@@ -40,10 +40,13 @@ public class VoiceTool implements ReceiveStreamListener {
 		try {
 			AudioFormat df = new AudioFormat(AudioFormat.LINEAR,8000,16,1);
 			Vector devices = CaptureDeviceManager.getDeviceList(df);
+			//SOLO HAY UNO CON ESTAS CARACTERISTICAS JAVASOUND
+			//COGE LOS DATOS DEL jmf.properties -> IMPOSIBLE PORTABILIDAD POR EL MOMENTO.
 			CaptureDeviceInfo di = (CaptureDeviceInfo) devices.elementAt(0);
 			DataSource daso = Manager.createDataSource(di.getLocator());
 			myProcessor = Manager.createProcessor(daso);
 			myProcessor.configure();
+			//ESPERAR 10 ms A QUE SE CONFIGURE EL PROCESSOR.
 			while (myProcessor.getState() != Processor.Configured) {
 				Thread.sleep(10);
 			}
@@ -53,45 +56,52 @@ public class VoiceTool implements ReceiveStreamListener {
 				case 3: af = new AudioFormat(AudioFormat.GSM_RTP,8000,16,1);
 				case 4: af = new AudioFormat(AudioFormat.G723_RTP,8000,16,1);
 			}
+			//Siempre coge formato GSM.
 			af = new AudioFormat(AudioFormat.GSM_RTP,8000,16,1);
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			System.out.println("0");
 			track[0].setFormat(af);
+			
+			// PERMITE CAMBIAR EL TAMAÑO DE LOS PAQUETES RTP PARA EVITAR EL DELAY ENTRE EMISOR Y RECEPTOR. ¡¡SOLO EN LA PRIMERA LLAMADA!!. DESPUÉS EL DELAY ENTRE EMISOR Y RECEPTOR ES DE MAS O MENOS 1s
 			RCModule rcm = new RCModule();
 			JavaEncoder je = new JavaEncoder();
 			Packetizer p = new Packetizer();
-			//Para cambiar el tamaño del paquete RTP
 			p.setPacketSize(33);
 			Codec[] c = {rcm,je,p};
 			track[0].setCodecChain(c);
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			// 
+			
+			System.out.println("1");
 			myProcessor.realize();
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			System.out.println("2");
+			// NO SALIR DEL BUCLE HASTA QUE PROCESSOR ESTE EN EL ESTADO REALIZED.
 			while(myProcessor.getState() != Processor.Realized) {
-				System.out.println("Bucleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+				System.out.println("Bucle");
 			}
-			System.out.println(track.toString());
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+
+			System.out.println("3");
 			DataSource ds = myProcessor.getDataOutput();
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			System.out.println("4");
 			myVoiceSessionManager = new RTPSessionMgr();
 			myVoiceSessionManager.addReceiveStreamListener(this);
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			System.out.println("5");
 			SessionAddress senderAddr = new SessionAddress();
 			myVoiceSessionManager.initSession(senderAddr, null, 0.05, 0.25);
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			System.out.println("6");
 			InetAddress destAddr = InetAddress.getByName(peerIP);
 			SessionAddress localAddr = new SessionAddress(InetAddress.getByName(myIP), recvPort, InetAddress.getByName(myIP), recvPort+1);
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			System.out.println("7");
 			SessionAddress remoteAddr = new SessionAddress(destAddr, peerPort, destAddr, peerPort+1);
-			//Metodo que provoca el delay de 5 seg
+			
+			//METODO QUE PROVOCA EL DELAY DE 5s DESDE QUE SE ESTABLECE LA LLAMADA HASTA QUE SOFTPHONE EMPIEZA A ENVIAR PAQUETES RTP. ¡¡ENCONTRAR SOLUCION!!
 			myVoiceSessionManager.startSession(localAddr, localAddr, remoteAddr, null);
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			
+			System.out.println("8");
 			ss = myVoiceSessionManager.createSendStream(ds, 0);
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			System.out.println("9");
 			ss.start();
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			System.out.println("10");
 			myProcessor.start();
-			System.out.println("eeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			System.out.println("11");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
